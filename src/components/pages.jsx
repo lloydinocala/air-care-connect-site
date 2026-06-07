@@ -401,7 +401,7 @@ export function Contact() {
                     }}>{field.label}</label>
                     <input type={field.type} placeholder={field.placeholder} style={{
                       width: '100%', padding: '12px 16px',
-                      background: 'rgba(255,255,255,0.06)',
+                      background: 'rgba(255,255,255,0.08)',
                       border: '1px solid rgba(255,255,255,0.15)',
                       borderRadius: 8, color: 'white',
                       fontFamily: 'var(--font-body)', fontSize: 15,
@@ -418,7 +418,7 @@ export function Contact() {
                   }}>How Can We Help?</label>
                   <textarea rows={4} placeholder="AC not cooling, needs tune-up, interested in Club membership..." style={{
                     width: '100%', padding: '12px 16px',
-                    background: 'rgba(255,255,255,0.06)',
+                    background: 'rgba(255,255,255,0.08)',
                     border: '1px solid rgba(255,255,255,0.15)',
                     borderRadius: 8, color: 'white',
                     fontFamily: 'var(--font-body)', fontSize: 15,
@@ -568,8 +568,8 @@ export function AireAzul() {
 export function Footer() {
   return (
     <footer style={{
-      background: '#050E1F',
-      borderTop: '1px solid rgba(255,255,255,0.06)',
+      background: '#1B3A6B',
+      borderTop: '1px solid rgba(255,255,255,0.08)',
       padding: '64px 0 32px',
     }}>
       <div className="container">
@@ -655,7 +655,7 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div style={{
-          borderTop: '1px solid rgba(255,255,255,0.06)',
+          borderTop: '1px solid rgba(255,255,255,0.08)',
           paddingTop: 24,
           display: 'flex', justifyContent: 'space-between',
           alignItems: 'center', flexWrap: 'wrap', gap: 12,

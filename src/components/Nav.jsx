@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 const PHONE_EN = '352-484-6341';
-const PHONE_ES = '407-963-8544';
 const PHONE_EN_HREF = 'tel:+13524846341';
+const PHONE_ES = '407-963-8544';
 
 export default function Nav({ menuOpen, setMenuOpen }) {
   const [scrolled, setScrolled] = useState(false);
@@ -15,18 +15,15 @@ export default function Nav({ menuOpen, setMenuOpen }) {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  useEffect(() => {
-    setMenuOpen(false);
-    window.scrollTo(0, 0);
-  }, [location.pathname]);
+  useEffect(() => { setMenuOpen(false); window.scrollTo(0, 0); }, [location.pathname]);
 
   const links = [
-    { to: '/',         label: 'Home' },
+    { to: '/', label: 'Home' },
     { to: '/services', label: 'Services' },
-    { to: '/club',     label: 'Air-Care Club' },
-    { to: '/about',    label: 'About' },
-    { to: '/contact',  label: 'Contact' },
-    { to: '/aire-azul',label: '🇪🇸 Español' },
+    { to: '/club', label: 'Air-Care Club' },
+    { to: '/about', label: 'About' },
+    { to: '/contact', label: 'Contact' },
+    { to: '/aire-azul', label: '🇪🇸 Español' },
   ];
 
   const isActive = (to) => location.pathname === to;
@@ -35,83 +32,67 @@ export default function Nav({ menuOpen, setMenuOpen }) {
     <>
       <nav style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000,
-        background: scrolled
-          ? 'rgba(11,29,58,0.97)'
-          : 'transparent',
-        backdropFilter: scrolled ? 'blur(20px)' : 'none',
-        borderBottom: scrolled ? '1px solid rgba(255,255,255,0.08)' : 'none',
+        background: scrolled ? 'rgba(255,255,255,0.97)' : 'rgba(255,255,255,0.95)',
+        backdropFilter: 'blur(20px)',
+        borderBottom: scrolled ? '1px solid rgba(77,184,232,0.2)' : '1px solid rgba(77,184,232,0.1)',
+        boxShadow: scrolled ? '0 2px 20px rgba(27,58,107,0.08)' : 'none',
         transition: 'all 0.3s ease',
         padding: '0 24px',
       }}>
         <div style={{
           maxWidth: 1200, margin: '0 auto',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          height: 72,
+          height: 70,
         }}>
           {/* Logo */}
           <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{
-              width: 40, height: 40,
-              background: 'linear-gradient(135deg, #1565C0, #00ACC1)',
+              width: 42, height: 42,
+              background: 'linear-gradient(135deg, #4DB8E8, #1B3A6B)',
               borderRadius: 10,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 20, flexShrink: 0,
-              boxShadow: '0 4px 16px rgba(21,101,192,0.4)',
+              fontSize: 22, flexShrink: 0,
+              boxShadow: '0 4px 12px rgba(77,184,232,0.3)',
             }}>❄️</div>
             <div>
               <div style={{
-                fontFamily: 'var(--font-display)',
-                fontWeight: 800, fontSize: 20,
-                letterSpacing: 1,
-                textTransform: 'uppercase',
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: 800, fontSize: 18,
+                color: '#1B3A6B',
                 lineHeight: 1,
-                color: 'var(--white)',
               }}>Air-Care Connect</div>
               <div style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: 9, letterSpacing: 2,
-                color: 'var(--cyan)', textTransform: 'uppercase',
-                lineHeight: 1, marginTop: 2,
+                fontFamily: 'Poppins, sans-serif',
+                fontSize: 10, letterSpacing: 2,
+                color: '#4DB8E8', textTransform: 'uppercase',
+                lineHeight: 1, marginTop: 2, fontWeight: 500,
               }}>Ocala & Central Florida</div>
             </div>
           </Link>
 
           {/* Desktop nav */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}
-               className="desktop-nav">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 2 }} className="desktop-nav">
             {links.map(l => (
               <Link key={l.to} to={l.to} style={{
                 padding: '6px 14px',
                 borderRadius: 8,
-                fontFamily: 'var(--font-display)',
-                fontSize: 15, fontWeight: 600,
-                letterSpacing: 0.5,
-                textTransform: 'uppercase',
-                color: isActive(l.to) ? 'var(--gold)' : 'rgba(255,255,255,0.85)',
-                background: isActive(l.to) ? 'rgba(249,168,37,0.1)' : 'transparent',
+                fontFamily: 'Poppins, sans-serif',
+                fontSize: 14, fontWeight: 600,
+                color: isActive(l.to) ? '#4DB8E8' : '#4A5568',
+                background: isActive(l.to) ? 'rgba(77,184,232,0.08)' : 'transparent',
                 transition: 'all 0.2s',
-                borderBottom: isActive(l.to) ? '2px solid var(--gold)' : '2px solid transparent',
-              }}
-              onMouseEnter={e => { if (!isActive(l.to)) e.target.style.color = 'white'; }}
-              onMouseLeave={e => { if (!isActive(l.to)) e.target.style.color = 'rgba(255,255,255,0.85)'; }}
-              >{l.label}</Link>
+                borderBottom: isActive(l.to) ? '2px solid #4DB8E8' : '2px solid transparent',
+              }}>{l.label}</Link>
             ))}
-            <a href={PHONE_EN_HREF} className="btn btn-primary btn-sm" style={{ marginLeft: 8 }}>
+            <a href={PHONE_EN_HREF} className="btn btn-navy btn-sm" style={{ marginLeft: 12, borderRadius: 8 }}>
               📞 {PHONE_EN}
             </a>
           </div>
 
           {/* Mobile hamburger */}
-          <button
-            onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}
+          <button onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}
             className="mobile-menu-btn"
-            style={{
-              background: 'none', border: 'none',
-              color: 'white', fontSize: 28, padding: 8,
-              display: 'none',
-            }}
-            aria-label="Menu"
-          >
+            style={{ background: 'none', border: 'none', color: '#1B3A6B', fontSize: 28, padding: 8, display: 'none' }}>
             {menuOpen ? '✕' : '☰'}
           </button>
         </div>
@@ -120,31 +101,24 @@ export default function Nav({ menuOpen, setMenuOpen }) {
       {/* Mobile drawer */}
       <div style={{
         position: 'fixed', inset: 0, zIndex: 999,
-        background: 'var(--navy)',
+        background: 'white',
         transform: menuOpen ? 'translateX(0)' : 'translateX(100%)',
         transition: 'transform 0.3s cubic-bezier(0.4,0,0.2,1)',
         display: 'flex', flexDirection: 'column',
-        padding: '100px 32px 40px',
-        gap: 8,
+        padding: '100px 32px 40px', gap: 4,
       }}>
         {links.map(l => (
           <Link key={l.to} to={l.to} style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 32, fontWeight: 800,
-            textTransform: 'uppercase',
-            color: isActive(l.to) ? 'var(--gold)' : 'rgba(255,255,255,0.9)',
-            padding: '12px 0',
-            borderBottom: '1px solid rgba(255,255,255,0.08)',
-            letterSpacing: 1,
+            fontFamily: 'Poppins, sans-serif',
+            fontSize: 24, fontWeight: 700,
+            color: isActive(l.to) ? '#4DB8E8' : '#1B3A6B',
+            padding: '14px 0',
+            borderBottom: '1px solid #EEF2F5',
           }}>{l.label}</Link>
         ))}
         <div style={{ marginTop: 32, display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <a href={PHONE_EN_HREF} className="btn btn-primary">
-            📞 English: {PHONE_EN}
-          </a>
-          <a href="tel:+14079638544" className="btn btn-outline">
-            📞 Español: {PHONE_ES}
-          </a>
+          <a href={PHONE_EN_HREF} className="btn btn-navy">📞 {PHONE_EN}</a>
+          <a href="tel:+14079638544" className="btn btn-outline">📞 Español: {PHONE_ES}</a>
         </div>
       </div>
 
