@@ -303,3 +303,71 @@ main { flex: 1; }
   .container { padding: 0 16px; }
   .btn-lg { padding: 14px 24px; font-size: 16px; }
 }
+
+/* ── Mobile Grid Fixes ──────────────────────────────────────── */
+@media (max-width: 768px) {
+
+  /* Hero — stack vertically, hide floating cards on small screens */
+  .hero-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .hero-float-card {
+    display: none !important;
+  }
+  .hero-top-badge {
+    display: none !important;
+  }
+
+  /* Club teaser on home — stack vertically */
+  .club-teaser-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .club-plan-minigrid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Services, About dual columns — stack */
+  .two-col-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Stats — 2 columns on mobile */
+  .stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .stats-grid > div {
+    border-right: none !important;
+    border-bottom: 1px solid #EEF2F5;
+  }
+
+  /* Contact grid */
+  .contact-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Plan cards — single column */
+  .plan-cards-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .plan-cards-grid > div {
+    transform: scale(1) !important;
+  }
+
+  /* Club comparison table — scrollable */
+  .compare-table-wrapper {
+    overflow-x: auto !important;
+  }
+
+  /* Services photo order fix */
+  .svc-photo { order: 0 !important; }
+  .svc-content { order: 1 !important; }
+
+  /* AireAzul plan cards */
+  .aire-plan-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Display text sizing */
+  .display-xl { font-size: 36px !important; }
+  .display-lg { font-size: 28px !important; }
+}
