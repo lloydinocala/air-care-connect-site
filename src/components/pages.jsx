@@ -55,7 +55,6 @@ function PhotoCarousel({ images, interval = 4500 }) {
   useEffect(() => {
     startTimer();
     return stopTimer;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [images.length]);
 
   const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; stopTimer(); };
