@@ -244,17 +244,17 @@ const SVCS = [
     points: ['Instant online quote available 24/7','All major brands','Permit handling included','Financing options available'],
     photo: 'PHOTO: New system installation / outdoor unit being placed',
     images: [
-      '/images/quote-app/See_What_a_New_Comfort_System_Could_Cost_for_Your_Home.jpg',
-      '/images/quote-app/What_Would_You_Like_to_Estimate.jpg',
-      '/images/quote-app/Determining_Your_System_Requirements.jpg',
-      '/images/quote-app/Please_Choose_A_Brand.jpg',
-      '/images/quote-app/Choose_Your_Brand_Family.jpg',
-      '/images/quote-app/Your_System_Recommendations.jpg',
-      '/images/quote-app/Review_Your_System_Details.jpg',
-      '/images/quote-app/Almost_There.jpg',
-      '/images/quote-app/Choose_Your_Installation_Date.jpg',
-      '/images/quote-app/Choose_How_You_Like_to_Pay.jpg',
-      '/images/quote-app/Booking_Confirmation.jpg',
+      '/See_What_a_New_Comfort_System_Could_Cost_for_Your_Home.jpg',
+      '/What_Would_You_Like_to_Estimate.jpg',
+      '/Determining_Your_System_Requirements.jpg',
+      '/Please_Choose_A_Brand.jpg',
+      '/Choose_Your_Brand_Family.jpg',
+      '/Your_System_Recommendations.jpg',
+      '/Review_Your_System_Details.jpg',
+      '/Almost_There.jpg',
+      '/Choose_Your_Installation_Date.jpg',
+      '/Choose_How_You_Like_to_Pay.jpg',
+      '/Booking_Confirmation.jpg',
     ],
     cta: { label: '⚡ Get Instant Quote', href: 'https://systemestimate.air-careconnect.com', external: true },
   },
@@ -882,4 +882,3 @@ export function Footer() {
     </footer>
   );
 }
-
