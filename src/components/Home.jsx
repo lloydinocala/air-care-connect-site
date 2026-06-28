@@ -259,7 +259,7 @@ export default function Home() {
           <p style={{ fontSize:'clamp(15px,1.8vw,18px)', color:'#4A5568', maxWidth:520, margin:'0 auto 36px', lineHeight:1.75 }}>
             Enter your address and our app gives you a guaranteed AC replacement price instantly, 24/7. No waiting, no sales pitch.
           </p>
-          <a href="https://air-care-connect-estimate-app.vercel.app" target="_blank" rel="noopener noreferrer"
+          <a href="https://systemestimate.air-careconnect.com" target="_blank" rel="noopener noreferrer"
              className="btn btn-navy btn-lg">
             ⚡ Get My Instant Quote →
           </a>
