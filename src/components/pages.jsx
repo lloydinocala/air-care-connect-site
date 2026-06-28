@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
 
 // ── Shared constants ──────────────────────────────────────────
 const PHONE_EN = '352-484-6341';
@@ -30,6 +31,101 @@ function PhotoPlaceholder({ label, height = 320 }) {
       <span style={{ fontSize: 32, opacity: 0.5 }}>📷</span>
       <span style={{ fontWeight: 600, color: SKY }}>{label}</span>
       <span style={{ opacity: 0.5 }}>Replace with actual photo</span>
+    </div>
+  );
+}
+
+// Auto-advancing screenshot carousel for the instant quote app.
+// Phone-shaped, swipeable, pauses on hover/touch, dot + arrow nav.
+function PhotoCarousel({ images, interval = 4500 }) {
+  const [index, setIndex] = useState(0);
+  const timerRef = useRef(null);
+  const touchStartX = useRef(null);
+
+  const goTo = (i) => setIndex(((i % images.length) + images.length) % images.length);
+  const next = () => goTo(index + 1);
+  const prev = () => goTo(index - 1);
+
+  const stopTimer = () => { if (timerRef.current) clearInterval(timerRef.current); };
+  const startTimer = () => {
+    stopTimer();
+    timerRef.current = setInterval(() => setIndex((i) => (i + 1) % images.length), interval);
+  };
+
+  useEffect(() => {
+    startTimer();
+    return stopTimer;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [images.length]);
+
+  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; stopTimer(); };
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current == null) return;
+    const delta = e.changedTouches[0].clientX - touchStartX.current;
+    if (delta > 40) prev();
+    else if (delta < -40) next();
+    touchStartX.current = null;
+    startTimer();
+  };
+
+  const arrowStyle = (side) => ({
+    position: 'absolute', top: '50%', [side]: 8, transform: 'translateY(-50%)',
+    width: 30, height: 30, borderRadius: '50%', border: 'none', cursor: 'pointer',
+    background: 'rgba(27,58,107,0.55)', color: WHITE, fontSize: 18, lineHeight: 1,
+    display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2,
+  });
+
+  return (
+    <div>
+      <div
+        onMouseEnter={stopTimer}
+        onMouseLeave={startTimer}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        style={{
+          position: 'relative', width: '100%', maxWidth: 300, margin: '0 auto',
+          aspectRatio: '9 / 19', borderRadius: 28, overflow: 'hidden',
+          background: WHITE, border: `1px solid ${GRAY_LT}`,
+          boxShadow: '0 16px 40px rgba(27,58,107,0.20)',
+        }}
+      >
+        {images.map((src, i) => (
+          <img
+            key={src}
+            src={src}
+            alt={`Instant quote app — step ${i + 1} of ${images.length}`}
+            loading={i === 0 ? 'eager' : 'lazy'}
+            style={{
+              position: 'absolute', inset: 0, width: '100%', height: '100%',
+              objectFit: 'cover', opacity: i === index ? 1 : 0,
+              transition: 'opacity 0.6s ease',
+            }}
+          />
+        ))}
+
+        <button onClick={() => { prev(); startTimer(); }} aria-label="Previous screenshot" style={arrowStyle('left')}>‹</button>
+        <button onClick={() => { next(); startTimer(); }} aria-label="Next screenshot" style={arrowStyle('right')}>›</button>
+
+        <div style={{
+          position: 'absolute', bottom: 12, left: 0, right: 0,
+          display: 'flex', justifyContent: 'center', gap: 6,
+        }}>
+          {images.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => { goTo(i); startTimer(); }}
+              aria-label={`Go to screenshot ${i + 1}`}
+              style={{
+                width: i === index ? 18 : 7, height: 7, borderRadius: 4,
+                border: 'none', cursor: 'pointer', padding: 0,
+                background: i === index ? WHITE : 'rgba(255,255,255,0.55)',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.25)',
+                transition: 'width 0.3s ease, background 0.3s ease',
+              }}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -147,7 +243,20 @@ const SVCS = [
     desc: 'When it\'s time for a new system, we make it simple. Use our instant quote tool to get a guaranteed price in 60 seconds — or call us for a full in-home assessment.',
     points: ['Instant online quote available 24/7','All major brands','Permit handling included','Financing options available'],
     photo: 'PHOTO: New system installation / outdoor unit being placed',
-    cta: { label: '⚡ Get Instant Quote', href: 'https://air-care-connect-estimate-app.vercel.app', external: true },
+    images: [
+      '/images/quote-app/See_What_a_New_Comfort_System_Could_Cost_for_Your_Home.jpg',
+      '/images/quote-app/What_Would_You_Like_to_Estimate.jpg',
+      '/images/quote-app/Determining_Your_System_Requirements.jpg',
+      '/images/quote-app/Please_Choose_A_Brand.jpg',
+      '/images/quote-app/Choose_Your_Brand_Family.jpg',
+      '/images/quote-app/Your_System_Recommendations.jpg',
+      '/images/quote-app/Review_Your_System_Details.jpg',
+      '/images/quote-app/Almost_There.jpg',
+      '/images/quote-app/Choose_Your_Installation_Date.jpg',
+      '/images/quote-app/Choose_How_You_Like_to_Pay.jpg',
+      '/images/quote-app/Booking_Confirmation.jpg',
+    ],
+    cta: { label: '⚡ Get Instant Quote', href: 'https://systemestimate.air-careconnect.com', external: true },
   },
   {
     icon: '💨', title: 'Indoor Air Quality',
@@ -203,7 +312,11 @@ export function Services() {
                 )}
               </div>
               <div style={{ order: i % 2 === 0 ? 1 : 0 }}>
-                <PhotoPlaceholder label={svc.photo} height={340} />
+                {svc.images ? (
+                  <PhotoCarousel images={svc.images} />
+                ) : (
+                  <PhotoPlaceholder label={svc.photo} height={340} />
+                )}
                 {svc.checklist && (
                   <div style={{
                     marginTop: 20, background: WHITE,
@@ -769,3 +882,4 @@ export function Footer() {
     </footer>
   );
 }
+
