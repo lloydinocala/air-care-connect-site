@@ -8,6 +8,7 @@ import Club from './components/Club';
 import About from './components/About';
 import Contact from './components/Contact';
 import AireAzul from './components/AireAzul';
+import ComfortGuideWidget from './components/ComfortGuideWidget';
 import './App.css';
 
 export default function App() {
@@ -28,6 +29,7 @@ export default function App() {
           </Routes>
         </main>
         <Footer />
+        <ComfortGuideWidget />
       </div>
     </Router>
   );
