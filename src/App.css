@@ -371,3 +371,29 @@ main { flex: 1; }
   .display-xl { font-size: 36px !important; }
   .display-lg { font-size: 28px !important; }
 }
+
+/* ── Comfort Guide widget panel ─────────────────────────────────────
+   Desktop: floating card, bottom-right.
+   Mobile: full-screen overlay, since a small floating panel is unusable
+   on small viewports. */
+.cg-widget-panel {
+  bottom: 24px;
+  right: 24px;
+  width: 380px;
+  height: 600px;
+  max-height: 75vh;
+  border-radius: 20px;
+  animation: cgPanelIn 0.25s ease both;
+}
+@keyframes cgPanelIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (max-width: 600px) {
+  .cg-widget-panel {
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%; height: 100%; max-height: 100%;
+    border-radius: 0;
+  }
+}
+
