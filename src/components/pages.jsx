@@ -1100,9 +1100,9 @@ export function AireAzul() {
             subtitle="Proteja su equipo y ahorre dinero con nuestra membresía anual. Mantenimiento profesional, servicio prioritario y descuentos en reparaciones." />
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20, marginBottom: 40 }}>
             {[
-              { icon:'🥈', name:'Plata', price:'$169/año', sub:'2 visitas • 10% desc.', color:'#78909C' },
-              { icon:'⭐', name:'Oro', price:'$249/año', sub:'3 visitas • 4 filtros • 15% desc.', color:GOLD, best:true },
-              { icon:'💎', name:'Platino', price:'$399/año', sub:'Prioridad VIP • Sin cargo de servicio', color:SKY },
+              { icon:'🥈', name:'Plata', price:'$189/año', sub:'2 visitas • 10% desc.', color:'#78909C', id:'silver' },
+              { icon:'⭐', name:'Oro', price:'$249/año', sub:'3 visitas • 4 filtros • 15% desc.', color:GOLD, best:true, id:'gold' },
+              { icon:'💎', name:'Platino', price:'$399/año', sub:'Prioridad VIP • Sin cargo de servicio', color:SKY, id:'platinum' },
             ].map((p, i) => (
               <div key={i} style={{
                 background: WHITE, border: `2px solid ${p.best ? GOLD : GRAY_LT}`,
@@ -1126,6 +1126,12 @@ export function AireAzul() {
                   {p.price}
                 </div>
                 <div style={{ fontSize:13, color:GRAY }}>{p.sub}</div>
+                <Link to={`/aire-azul/documentos?plan=${p.id}`} style={{
+                  display:'block', marginTop:14, fontSize:12, fontWeight:600,
+                  color:GRAY_DK, textDecoration:'underline', fontFamily:'Poppins,sans-serif',
+                }}>
+                  📧 Recibir este acuerdo por correo
+                </Link>
               </div>
             ))}
           </div>
@@ -1278,4 +1284,5 @@ export function Footer() {
     </footer>
   );
 }
+
 
