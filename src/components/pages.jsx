@@ -229,6 +229,10 @@ const SVCS = [
     desc: 'Your AC chose the worst possible day to break down — we know. Air-Care Connect offers fast diagnosis and same-day repair for most issues. Our technicians carry common parts on every truck.',
     points: ['All makes and models','Same-day service available','Upfront pricing before we start','No overtime charges for Club members'],
     photo: 'PHOTO: Technician repairing indoor air handler unit',
+    ctas: [
+      { label: `📞 Call: ${PHONE_EN}`, href: PHONE_EN_HREF },
+      { label: '📅 Book a Service Call', href: '/contact', internal: true },
+    ],
   },
   {
     icon: '🔍', title: '21-Point Maintenance Tune-Up',
@@ -303,7 +307,19 @@ export function Services() {
                     </li>
                   ))}
                 </ul>
-                {svc.cta ? (
+                {svc.ctas ? (
+                  <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                    {svc.ctas.map((c, k) => (
+                      c.internal ? (
+                        <Link key={k} to={c.href} className="btn btn-navy">{c.label}</Link>
+                      ) : c.external ? (
+                        <a key={k} href={c.href} target="_blank" rel="noopener noreferrer" className="btn btn-navy">{c.label}</a>
+                      ) : (
+                        <a key={k} href={c.href} className="btn btn-navy">{c.label}</a>
+                      )
+                    ))}
+                  </div>
+                ) : svc.cta ? (
                   <a href={svc.cta.href} target="_blank" rel="noopener noreferrer"
                      className="btn btn-navy">{svc.cta.label}</a>
                 ) : (
