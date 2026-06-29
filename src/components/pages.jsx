@@ -259,7 +259,10 @@ const SVCS = [
       '/Choose%20How%20You%20Like%20to%20Pay.jpg',
       '/Booking%20Confirmation.jpg',
     ],
-    cta: { label: '⚡ Get Instant Quote', href: 'https://systemestimate.air-careconnect.com', external: true },
+    ctas: [
+      { label: `📞 Call: ${PHONE_EN}`, href: PHONE_EN_HREF },
+      { label: '⚡ Get Instant Quote', href: 'https://systemestimate.air-careconnect.com', external: true },
+    ],
   },
   {
     icon: '💨', title: 'Indoor Air Quality',
