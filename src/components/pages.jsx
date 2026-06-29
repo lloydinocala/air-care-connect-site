@@ -634,7 +634,7 @@ export function Contact() {
           lead_status: 'new',
           booking_date: date,
           time_slot: slot,
-          booking_status: 'confirmed',
+          contact_preference: form.email ? 'email' : 'phone',
           organization_id: 1,
         }),
       });
@@ -681,7 +681,7 @@ export function Contact() {
           notes: `[Marketing site - Contact form] ${summaryLine}`,
           language: 'en',
           lead_status: 'new',
-          booking_status: 'requested',
+          contact_preference: form.email ? 'email' : 'phone',
           organization_id: 1,
         }),
       });
