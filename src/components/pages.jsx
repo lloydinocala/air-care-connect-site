@@ -242,7 +242,7 @@ const SVCS = [
     checklist: true,
     ctas: [
       { label: `📞 Call: ${PHONE_EN}`, href: PHONE_EN_HREF },
-      { label: '📅 Book a Service Call', href: `/contact?issue=${encodeURIComponent('Routine Maintenance / Tune-Up')}`, internal: true },
+      { label: '📅 Book a Maintenance Tune-Up', href: `/contact?issue=${encodeURIComponent('Routine Maintenance / Tune-Up')}`, internal: true },
     ],
   },
   {
@@ -275,7 +275,7 @@ const SVCS = [
     photo: 'PHOTO: Filter or IAQ equipment close-up',
     ctas: [
       { label: `📞 Call: ${PHONE_EN}`, href: PHONE_EN_HREF },
-      { label: '📅 Book a Service Call', href: `/contact?issue=${encodeURIComponent('Duct Cleaning')}`, internal: true },
+      { label: '📅 Book a Duct Cleaning', href: `/contact?issue=${encodeURIComponent('Duct Cleaning')}`, internal: true },
     ],
   },
 ];
@@ -1278,3 +1278,4 @@ export function Footer() {
     </footer>
   );
 }
+
