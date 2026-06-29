@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 
 // ── Shared constants ──────────────────────────────────────────
@@ -240,6 +240,10 @@ const SVCS = [
     points: ['Full 21-point inspection protocol','Written report after every visit','Included in all Air-Care Club plans','Spring and fall scheduling windows'],
     photo: 'PHOTO: Technician performing tune-up / checking gauges',
     checklist: true,
+    ctas: [
+      { label: `📞 Call: ${PHONE_EN}`, href: PHONE_EN_HREF },
+      { label: '📅 Book a Service Call', href: `/contact?issue=${encodeURIComponent('Routine Maintenance / Tune-Up')}`, internal: true },
+    ],
   },
   {
     icon: '❄️', title: 'System Replacement',
@@ -265,10 +269,14 @@ const SVCS = [
     ],
   },
   {
-    icon: '💨', title: 'Indoor Air Quality',
+    icon: '💨', title: 'Duct Cleaning & Indoor Air Quality',
     desc: 'Florida\'s humidity creates unique challenges — mold risk, airborne allergens, and musty air are common complaints. We offer filtration upgrades, UV systems, and whole-home dehumidification.',
     points: ['MERV 8, 11, and 13 filtration upgrades','UV germicidal light installation','Whole-home dehumidification','Duct cleaning assessment'],
     photo: 'PHOTO: Filter or IAQ equipment close-up',
+    ctas: [
+      { label: `📞 Call: ${PHONE_EN}`, href: PHONE_EN_HREF },
+      { label: '📅 Book a Service Call', href: `/contact?issue=${encodeURIComponent('Duct Cleaning')}`, internal: true },
+    ],
   },
 ];
 
@@ -515,9 +523,18 @@ const ISSUE_OPTIONS = [
   'Strange Noise or Smell',
   'Water Leak',
   'Routine Maintenance / Tune-Up',
+  'Duct Cleaning',
+  'Indoor Air Quality / Filtration',
   'General Question',
   'Other',
 ];
+
+// AC Repair + Maintenance share one crew/truck, so they share one calendar.
+// Duct Cleaning / IAQ is a separate crew with its own (much sparser) calendar.
+const DUCT_IAQ_ISSUES = ['Duct Cleaning', 'Indoor Air Quality / Filtration'];
+function getCalendarForIssue(issue) {
+  return DUCT_IAQ_ISSUES.includes(issue) ? 'duct_iaq' : 'general';
+}
 
 const TIME_OPTIONS = [
   'Morning (8am–12pm)',
@@ -557,9 +574,16 @@ function formatHourLabel(hourDecimal) {
 
 // Builds the day's bookable arrival windows, every 2.5 hours, based on your
 // posted hours (Mon–Fri 7am–7pm, Sat 8am–5pm). Closed Sunday → returns [].
-function getDaySlots(dateStr) {
+function getDaySlots(dateStr, calendar = 'general') {
   const d = new Date(`${dateStr}T00:00:00`);
   const day = d.getDay(); // 0 = Sunday, 6 = Saturday
+
+  if (calendar === 'duct_iaq') {
+    // Separate crew, longer jobs — just two fixed arrivals, weekdays only.
+    if (day === 0 || day === 6) return [];
+    return ['8:30 AM', '2:00 PM'];
+  }
+
   if (day === 0) return [];
   const isSat = day === 6;
   const openHour = isSat ? 8 : 7;
@@ -576,6 +600,7 @@ function getDaySlots(dateStr) {
 }
 
 export function Contact() {
+  const location = useLocation();
   const [mode, setMode] = useState('book'); // 'book' (self-schedule) | 'callback' (ask us to call)
   const [form, setForm] = useState({
     name: '', phone: '', email: '', address: '', issue: ISSUE_OPTIONS[0], notes: '',
@@ -588,6 +613,15 @@ export function Contact() {
   const [callbackTime, setCallbackTime] = useState(TIME_OPTIONS[0]);
   const [status, setStatus] = useState('idle'); // idle | missing | submitting | success
 
+  // Arriving from a "Book a Service Call" button on the Services page —
+  // pre-select the matching issue so people don't have to re-pick it.
+  useEffect(() => {
+    const requested = new URLSearchParams(location.search).get('issue');
+    if (requested && ISSUE_OPTIONS.includes(requested)) {
+      setForm((f) => ({ ...f, issue: requested }));
+    }
+  }, [location.search]);
+
   const update = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
 
   const switchMode = (next) => {
@@ -595,12 +629,16 @@ export function Contact() {
     setStatus('idle');
   };
 
+  const calendar = getCalendarForIssue(form.issue); // 'general' (repair+maintenance) | 'duct_iaq'
+
   // Pull how many bookings already exist per slot for the chosen date,
   // via a Postgres function (keeps the raw leads table itself locked down).
+  // Scoped per calendar — AC Repair/Maintenance share one truck's slots;
+  // Duct Cleaning/IAQ is a separate crew with its own slot pool.
   useEffect(() => {
     if (mode !== 'book' || !date) { setDaySlots([]); setSlot(''); return; }
 
-    const labels = getDaySlots(date);
+    const labels = getDaySlots(date, calendar);
     setSlot('');
     if (labels.length === 0) { setDaySlots([]); return; }
 
@@ -612,7 +650,7 @@ export function Contact() {
         const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_booked_slot_counts`, {
           method: 'POST',
           headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ p_date: date }),
+          body: JSON.stringify({ p_date: date, p_calendar: calendar }),
         });
         const data = await r.json();
         if (Array.isArray(data)) data.forEach((row) => { counts[row.time_slot] = row.slot_count; });
@@ -623,7 +661,7 @@ export function Contact() {
       }
     })();
     return () => { cancelled = true; };
-  }, [date, mode]);
+  }, [date, mode, calendar]);
 
   const resetForm = () => {
     setForm({ name: '', phone: '', email: '', address: '', issue: ISSUE_OPTIONS[0], notes: '' });
@@ -653,6 +691,7 @@ export function Contact() {
           lead_status: 'new',
           booking_date: date,
           time_slot: slot,
+          booking_calendar: calendar,
           contact_preference: form.email ? 'email' : 'phone',
           organization_id: 1,
         }),
