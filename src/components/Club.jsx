@@ -16,7 +16,7 @@ const GOLD = '#F9A825';
 const PLANS = [
   {
     id:'silver', icon:'🥈', name:'Air-Care Silver',
-    price:169, monthly:14.99,
+    price:189, monthly:14.99,
     color:'#78909C', colorPale:'#ECEFF1',
     border:'#B0BEC5',
     tagline:'Essential Protection',
@@ -83,7 +83,7 @@ const PLANS = [
 ];
 
 const COMPARE_ROWS = [
-  ['Annual Price','$169','$249','$399'],
+  ['Annual Price','$189','$249','$399'],
   ['Monthly Option','$14.99/mo','$21.99/mo','$35.99/mo'],
   ['Tune-Up Visits','2','2 + comfort check','2 + unlimited priority'],
   ['Filters Included/Year','2','4','4 + delivery option'],
@@ -262,6 +262,16 @@ export default function Club() {
                   }}>
                     Join {plan.name.replace('Air-Care ','')} Plan
                   </a>
+
+                  {/* Email agreement CTA */}
+                  <Link to={`/club/documents?plan=${plan.id}`} style={{
+                    display:'flex', alignItems:'center', justifyContent:'center',
+                    width:'100%', padding:'10px', marginTop:10,
+                    color: GRAY_DK, fontSize:13, fontWeight:600,
+                    fontFamily:'Poppins,sans-serif', textDecoration:'underline',
+                  }}>
+                    📧 Email Me This Agreement to Review
+                  </Link>
                 </div>
               </div>
             ))}
@@ -328,3 +338,4 @@ export default function Club() {
     </>
   );
 }
+
