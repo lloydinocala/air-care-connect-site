@@ -220,8 +220,14 @@ export default function ComfortGuideWidget() {
           : `✅ Done! A team member will call you at ${phone} soon.` }]);
       } else if (d.text) {
         setMsgs(p => [...p, { role: 'assistant', content: d.text }]);
+      } else if (d.error) {
+        console.error('Comfort Guide API returned an error:', d.error);
+        setMsgs(p => [...p, { role: 'assistant', content: lang === 'es'
+          ? `Hubo un problema (${d.error}). Por favor intenta de nuevo o llámanos directamente.`
+          : `Something went wrong (${d.error}). Please try again, or call us directly.` }]);
       } else {
-        setMsgs(p => [...p, { role: 'assistant', content: lang === 'es' ? 'Tuve un problema conectando — intenta de nuevo.' : "I'm having trouble connecting — please try again in a moment." }]);
+        console.error('Comfort Guide: unexpected response shape:', d);
+        setMsgs(p => [...p, { role: 'assistant', content: lang === 'es' ? 'Respuesta inesperada — intenta de nuevo.' : 'Unexpected response — please try again.' }]);
       }
     } catch (err) {
       console.error('Comfort Guide fetch error:', err);
