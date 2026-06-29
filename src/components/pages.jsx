@@ -482,15 +482,261 @@ export function About() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// CONTACT
+// CONTACT / BOOK A SERVICE CALL
 // ═══════════════════════════════════════════════════════════════
+// Same publishable Supabase project the quote app and Comfort Guide write
+// leads to — keeping all leads in one table regardless of which surface
+// they came from.
+const SUPABASE_URL = "https://dalertxugwgkfsyizmly.supabase.co";
+const SUPABASE_KEY = "sb_publishable_nPaxXCiHyZkO8MkRsz-1Zw_ZgPBlybk";
+
+const ISSUE_OPTIONS = [
+  'No Cooling',
+  'No Heat',
+  'Strange Noise or Smell',
+  'Water Leak',
+  'Routine Maintenance / Tune-Up',
+  'General Question',
+  'Other',
+];
+
+const TIME_OPTIONS = [
+  'Morning (8am–12pm)',
+  'Afternoon (12pm–4pm)',
+  'Evening (4pm–7pm)',
+  'ASAP — today if possible',
+];
+
+const inputStyle = {
+  width: '100%', padding: '12px 16px',
+  background: OFF_WHITE, border: `1px solid ${GRAY_LT}`,
+  borderRadius: 10, color: CHARCOAL,
+  fontFamily: 'Inter, sans-serif', fontSize: 15, outline: 'none',
+};
+
+const labelStyle = {
+  display: 'block', fontSize: 12,
+  fontFamily: 'Poppins, sans-serif', letterSpacing: 1.5,
+  textTransform: 'uppercase', color: GRAY_DK,
+  fontWeight: 600, marginBottom: 6,
+};
+
+// Max simultaneous bookings allowed per time slot. Raise this if you have
+// more than one truck available to run service calls at the same time.
+const SLOT_CAPACITY = 1;
+
+function pad2(n) { return n < 10 ? `0${n}` : `${n}`; }
+
+function formatHourLabel(hourDecimal) {
+  const h = Math.floor(hourDecimal);
+  const m = hourDecimal % 1 >= 0.5 ? 30 : 0;
+  const period = h >= 12 ? 'PM' : 'AM';
+  let displayH = h % 12;
+  if (displayH === 0) displayH = 12;
+  return `${displayH}:${pad2(m)} ${period}`;
+}
+
+// Builds the day's bookable arrival windows, every 2.5 hours, based on your
+// posted hours (Mon–Fri 7am–7pm, Sat 8am–5pm). Closed Sunday → returns [].
+function getDaySlots(dateStr) {
+  const d = new Date(`${dateStr}T00:00:00`);
+  const day = d.getDay(); // 0 = Sunday, 6 = Saturday
+  if (day === 0) return [];
+  const isSat = day === 6;
+  const openHour = isSat ? 8 : 7;
+  const closeHour = isSat ? 17 : 19;
+
+  const slots = [];
+  let h = openHour;
+  while (h < closeHour) {
+    const end = Math.min(h + 2.5, closeHour);
+    slots.push(`${formatHourLabel(h)} – ${formatHourLabel(end)}`);
+    h += 2.5;
+  }
+  return slots;
+}
+
 export function Contact() {
+  const [mode, setMode] = useState('book'); // 'book' (self-schedule) | 'callback' (ask us to call)
+  const [form, setForm] = useState({
+    name: '', phone: '', email: '', address: '', issue: ISSUE_OPTIONS[0], notes: '',
+  });
+  const [date, setDate] = useState('');
+  const [slot, setSlot] = useState('');
+  const [slotsLoading, setSlotsLoading] = useState(false);
+  const [daySlots, setDaySlots] = useState([]); // [{ label, full }]
+  const [callbackDate, setCallbackDate] = useState('');
+  const [callbackTime, setCallbackTime] = useState(TIME_OPTIONS[0]);
+  const [status, setStatus] = useState('idle'); // idle | missing | submitting | success
+
+  const update = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
+
+  const switchMode = (next) => {
+    setMode(next);
+    setStatus('idle');
+  };
+
+  // Pull how many bookings already exist per slot for the chosen date,
+  // via a Postgres function (keeps the raw leads table itself locked down).
+  useEffect(() => {
+    if (mode !== 'book' || !date) { setDaySlots([]); setSlot(''); return; }
+
+    const labels = getDaySlots(date);
+    setSlot('');
+    if (labels.length === 0) { setDaySlots([]); return; }
+
+    let cancelled = false;
+    setSlotsLoading(true);
+    (async () => {
+      let counts = {};
+      try {
+        const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_booked_slot_counts`, {
+          method: 'POST',
+          headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ p_date: date }),
+        });
+        const data = await r.json();
+        if (Array.isArray(data)) data.forEach((row) => { counts[row.time_slot] = row.slot_count; });
+      } catch (e) { console.warn('Slot availability fetch error:', e); }
+      if (!cancelled) {
+        setDaySlots(labels.map((label) => ({ label, full: (counts[label] || 0) >= SLOT_CAPACITY })));
+        setSlotsLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [date, mode]);
+
+  const resetForm = () => {
+    setForm({ name: '', phone: '', email: '', address: '', issue: ISSUE_OPTIONS[0], notes: '' });
+    setDate(''); setSlot(''); setDaySlots([]);
+    setCallbackDate(''); setCallbackTime(TIME_OPTIONS[0]);
+  };
+
+  const handleBookSubmit = async () => {
+    if (!form.name.trim() || !form.phone.trim() || !form.address.trim() || !date || !slot) {
+      setStatus('missing');
+      return;
+    }
+    setStatus('submitting');
+
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/leads`, {
+        method: 'POST',
+        headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify({
+          lead_type: 'service_call_booking',
+          property_address: form.address,
+          customer_name: form.name,
+          customer_email: form.email || null,
+          customer_phone: form.phone,
+          notes: `[Marketing site - self-booked]${form.notes ? ' ' + form.notes : ''}`,
+          language: 'en',
+          lead_status: 'new',
+          booking_date: date,
+          time_slot: slot,
+          booking_status: 'confirmed',
+          organization_id: 1,
+        }),
+      });
+    } catch (e) { console.warn('Booking save error:', e); }
+
+    try {
+      await fetch('/api/confirm-service-call', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name, phone: form.phone, email: form.email || null,
+          address: form.address, issue: form.issue, date, slot, notes: form.notes,
+        }),
+      });
+    } catch (e) { console.warn('Confirmation send error:', e); }
+
+    setStatus('success');
+    resetForm();
+  };
+
+  const handleCallbackSubmit = async () => {
+    if (!form.name.trim() || !form.phone.trim() || !form.address.trim()) {
+      setStatus('missing');
+      return;
+    }
+    setStatus('submitting');
+
+    const summaryLine = [
+      `Issue: ${form.issue}`,
+      callbackDate ? `Preferred date: ${callbackDate}` : null,
+      `Preferred time: ${callbackTime}`,
+      form.notes ? `Message: ${form.notes}` : null,
+    ].filter(Boolean).join(' | ');
+
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/leads`, {
+        method: 'POST',
+        headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify({
+          lead_type: 'service_call_callback_request',
+          property_address: form.address,
+          customer_name: form.name,
+          customer_email: form.email || null,
+          customer_phone: form.phone,
+          notes: `[Marketing site - Contact form] ${summaryLine}`,
+          language: 'en',
+          lead_status: 'new',
+          booking_status: 'requested',
+          organization_id: 1,
+        }),
+      });
+    } catch (e) { console.warn('Lead save error:', e); }
+
+    try {
+      await fetch('/api/send-email', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: 'info@air-careconnect.com',
+          subject: `📞 Callback Requested — ${form.name}`,
+          htmlContent: `
+            <div style="font-family: sans-serif; max-width: 480px;">
+              <h2 style="color: ${NAVY};">New Callback Request</h2>
+              <p><strong>Name:</strong> ${form.name}</p>
+              <p><strong>Phone:</strong> ${form.phone}</p>
+              ${form.email ? `<p><strong>Email:</strong> ${form.email}</p>` : ''}
+              <p><strong>Address:</strong> ${form.address}</p>
+              <p><strong>Issue:</strong> ${form.issue}</p>
+              ${callbackDate ? `<p><strong>Preferred Date:</strong> ${callbackDate}</p>` : ''}
+              <p><strong>Preferred Time:</strong> ${callbackTime}</p>
+              ${form.notes ? `<p><strong>Message:</strong> ${form.notes}</p>` : ''}
+              <p style="color:#64748b; font-size:13px;">Submitted via the Contact page — nothing is scheduled yet, customer wants a callback.</p>
+            </div>`,
+        }),
+      });
+    } catch (e) { console.warn('Email notification error:', e); }
+
+    try {
+      await fetch('/api/send-sms', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          body: `Callback requested: ${form.name}, ${form.phone}. ${form.issue}. Preferred: ${callbackDate || 'no date given'} - ${callbackTime}. Address: ${form.address}`,
+        }),
+      });
+    } catch (e) { console.warn('SMS notification error:', e); }
+
+    setStatus('success');
+    resetForm();
+  };
+
+  const tabStyle = (active) => ({
+    flex: 1, padding: '12px 16px', borderRadius: 10, cursor: 'pointer',
+    textAlign: 'center', fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 13,
+    border: active ? `2px solid ${SKY}` : `1px solid ${GRAY_LT}`,
+    background: active ? SKY_PALE : WHITE, color: active ? NAVY : GRAY_DK,
+    transition: 'all 0.15s',
+  });
+
   return (
     <>
       <PageHero
         eyebrow="Reach Us"
         title="Contact Us"
-        subtitle="Call, text, or send a message. We respond fast — especially for Air-Care Club members."
+        subtitle="Call, text, or book a service call online. We respond fast — especially for Air-Care Club members."
       />
 
       <section style={{ background: OFF_WHITE, padding: '80px 0' }}>
@@ -552,7 +798,7 @@ export function Contact() {
               </div>
             </div>
 
-            {/* Contact form */}
+            {/* Book a Service Call form */}
             <div style={{
               background: WHITE, border: `1px solid ${GRAY_LT}`,
               borderRadius: 20, padding: 40,
@@ -561,50 +807,143 @@ export function Contact() {
               <h2 style={{
                 fontFamily: 'Poppins, sans-serif', fontSize: 24,
                 fontWeight: 700, color: NAVY, marginBottom: 24,
-              }}>Send a Message</h2>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                {[
-                  { label:'Your Name', type:'text', placeholder:'John Smith' },
-                  { label:'Phone Number', type:'tel', placeholder:'(352) 000-0000' },
-                  { label:'Email Address', type:'email', placeholder:'john@example.com' },
-                  { label:'City / Neighborhood', type:'text', placeholder:'Ocala, The Villages, etc.' },
-                ].map((field, i) => (
-                  <div key={i}>
-                    <label style={{
-                      display: 'block', fontSize: 12,
-                      fontFamily: 'Poppins, sans-serif', letterSpacing: 1.5,
-                      textTransform: 'uppercase', color: GRAY_DK,
-                      fontWeight: 600, marginBottom: 6,
-                    }}>{field.label}</label>
-                    <input type={field.type} placeholder={field.placeholder} style={{
-                      width: '100%', padding: '12px 16px',
-                      background: OFF_WHITE, border: `1px solid ${GRAY_LT}`,
-                      borderRadius: 10, color: CHARCOAL,
-                      fontFamily: 'Inter, sans-serif', fontSize: 15, outline: 'none',
-                    }} />
+              }}>Book a Service Call</h2>
+
+              {status === 'success' ? (
+                <div style={{
+                  background: SKY_PALE, border: `1px solid rgba(77,184,232,0.3)`,
+                  borderRadius: 14, padding: 24, textAlign: 'center',
+                }}>
+                  <div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>
+                  <div style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, color: NAVY, marginBottom: 6 }}>
+                    {mode === 'book' ? 'You\'re booked!' : 'Request received!'}
                   </div>
-                ))}
-                <div>
-                  <label style={{
-                    display: 'block', fontSize: 12, fontFamily: 'Poppins, sans-serif',
-                    letterSpacing: 1.5, textTransform: 'uppercase', color: GRAY_DK,
-                    fontWeight: 600, marginBottom: 6,
-                  }}>How Can We Help?</label>
-                  <textarea rows={4} placeholder="AC not cooling, needs tune-up, interested in Club membership..." style={{
-                    width: '100%', padding: '12px 16px',
-                    background: OFF_WHITE, border: `1px solid ${GRAY_LT}`,
-                    borderRadius: 10, color: CHARCOAL,
-                    fontFamily: 'Inter, sans-serif', fontSize: 15,
-                    resize: 'vertical', outline: 'none',
-                  }} />
+                  <p style={{ fontSize: 14, color: GRAY_DK, lineHeight: 1.6 }}>
+                    {mode === 'book'
+                      ? 'Check your phone — a text confirming your appointment time is on the way (and an email too, if you gave us one).'
+                      : 'A team member will call or text you shortly to confirm your appointment.'}
+                  </p>
+                  <button className="btn btn-navy" style={{ marginTop: 16 }} onClick={() => setStatus('idle')}>
+                    Book Another Service Call
+                  </button>
                 </div>
-                <button className="btn btn-navy" style={{ width: '100%', justifyContent: 'center', marginTop: 8 }}>
-                  Send Message →
-                </button>
-                <p style={{ fontSize: 12, color: GRAY, textAlign: 'center' }}>
-                  We typically respond within 2 hours during business hours.
-                </p>
-              </div>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', gap: 10, marginBottom: 24 }}>
+                    <div style={tabStyle(mode === 'book')} onClick={() => switchMode('book')}>
+                      📅 Book My Own Time
+                    </div>
+                    <div style={tabStyle(mode === 'callback')} onClick={() => switchMode('callback')}>
+                      📞 Have Us Call You
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    <div>
+                      <label style={labelStyle}>Your Name *</label>
+                      <input type="text" placeholder="John Smith" value={form.name} onChange={update('name')} style={inputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Phone Number *</label>
+                      <input type="tel" placeholder="(352) 000-0000" value={form.phone} onChange={update('phone')} style={inputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Email Address {mode === 'book' && '(for an email confirmation too)'}</label>
+                      <input type="email" placeholder="john@example.com" value={form.email} onChange={update('email')} style={inputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Service Address *</label>
+                      <input type="text" placeholder="123 Main St, Ocala, FL" value={form.address} onChange={update('address')} style={inputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>What's Going On?</label>
+                      <select value={form.issue} onChange={update('issue')} style={inputStyle}>
+                        {ISSUE_OPTIONS.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+                      </select>
+                    </div>
+
+                    {mode === 'book' ? (
+                      <>
+                        <div>
+                          <label style={labelStyle}>Pick a Date *</label>
+                          <input type="date" min={new Date().toISOString().split('T')[0]} value={date} onChange={(e) => setDate(e.target.value)} style={inputStyle} />
+                        </div>
+
+                        {date && (
+                          <div>
+                            <label style={labelStyle}>Pick a Time *</label>
+                            {slotsLoading ? (
+                              <p style={{ fontSize: 13, color: GRAY_DK }}>Checking availability...</p>
+                            ) : daySlots.length === 0 ? (
+                              <p style={{ fontSize: 13, color: '#C62828' }}>We're closed that day — please pick another date.</p>
+                            ) : (
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                                {daySlots.map((s) => (
+                                  <button
+                                    key={s.label}
+                                    type="button"
+                                    disabled={s.full}
+                                    onClick={() => setSlot(s.label)}
+                                    style={{
+                                      padding: '10px 8px', borderRadius: 10, fontSize: 13, fontWeight: 600,
+                                      cursor: s.full ? 'not-allowed' : 'pointer',
+                                      border: slot === s.label ? `2px solid ${SKY}` : `1px solid ${GRAY_LT}`,
+                                      background: s.full ? GRAY_LT : (slot === s.label ? SKY_PALE : WHITE),
+                                      color: s.full ? GRAY : (slot === s.label ? NAVY : GRAY_DK),
+                                    }}
+                                  >
+                                    {s.label}{s.full ? ' — Full' : ''}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                        <div>
+                          <label style={labelStyle}>Preferred Date</label>
+                          <input type="date" min={new Date().toISOString().split('T')[0]} value={callbackDate} onChange={(e) => setCallbackDate(e.target.value)} style={inputStyle} />
+                        </div>
+                        <div>
+                          <label style={labelStyle}>Preferred Time</label>
+                          <select value={callbackTime} onChange={(e) => setCallbackTime(e.target.value)} style={inputStyle}>
+                            {TIME_OPTIONS.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+                          </select>
+                        </div>
+                      </div>
+                    )}
+
+                    <div>
+                      <label style={labelStyle}>Anything Else We Should Know?</label>
+                      <textarea rows={3} placeholder="Any extra details about the issue..." value={form.notes} onChange={update('notes')} style={{ ...inputStyle, resize: 'vertical' }} />
+                    </div>
+
+                    {status === 'missing' && (
+                      <p style={{ fontSize: 13, color: '#C62828', textAlign: 'center', margin: 0 }}>
+                        {mode === 'book'
+                          ? 'Please fill in your name, phone, address, and pick a date and time.'
+                          : 'Please fill in your name, phone number, and service address.'}
+                      </p>
+                    )}
+
+                    <button
+                      className="btn btn-navy"
+                      style={{ width: '100%', justifyContent: 'center', marginTop: 8, opacity: status === 'submitting' ? 0.6 : 1 }}
+                      disabled={status === 'submitting'}
+                      onClick={mode === 'book' ? handleBookSubmit : handleCallbackSubmit}
+                    >
+                      {status === 'submitting' ? 'Submitting...' : (mode === 'book' ? 'Confirm Booking →' : 'Request Callback →')}
+                    </button>
+                    <p style={{ fontSize: 12, color: GRAY, textAlign: 'center' }}>
+                      {mode === 'book'
+                        ? 'This locks in your appointment instantly — confirmed by text right away.'
+                        : 'Our team confirms the exact appointment time by phone or text.'}
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
