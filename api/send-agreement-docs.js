@@ -21,13 +21,8 @@ const PLAN_INFO = {
   },
 };
 
-// Stripe Payment Links — same checkout regardless of language (set these in
-// Vercel once created in Stripe; see setup notes provided separately).
-const STRIPE_LINKS = {
-  silver: process.env.STRIPE_LINK_SILVER || null,
-  gold: process.env.STRIPE_LINK_GOLD || null,
-  platinum: process.env.STRIPE_LINK_PLATINUM || null,
-};
+// Stripe enrollment links now go through /api/start-checkout, which builds
+// a fresh Checkout Session per click (see that file for plan -> price wiring).
 
 const STRINGS = {
   en: {
@@ -78,13 +73,13 @@ export default async function handler(req, res) {
     const planBlocks = validPlans.map((key) => {
       const p = info[key];
       const pdfUrl = `${SITE_URL}/agreements/${p.file}`;
-      const stripeUrl = STRIPE_LINKS[key];
+      const checkoutUrl = `${SITE_URL}/api/start-checkout?plan=${key}&email=${encodeURIComponent(email)}`;
       return `
         <div style="border:1px solid #EEF2F5; border-radius:12px; padding:20px; margin-bottom:16px;">
           <div style="font-weight:700; font-size:17px; color:#1B3A6B; margin-bottom:4px;">${p.name}</div>
           <div style="color:#4A5568; font-size:14px; margin-bottom:14px;">${p.price}</div>
           <a href="${pdfUrl}" style="display:inline-block; padding:10px 18px; border:2px solid #1B3A6B; border-radius:8px; color:#1B3A6B; text-decoration:none; font-weight:600; font-size:14px; margin-right:10px;">${t.viewBtn}</a>
-          ${stripeUrl ? `<a href="${stripeUrl}" style="display:inline-block; padding:10px 18px; background:#1B3A6B; border-radius:8px; color:#ffffff; text-decoration:none; font-weight:600; font-size:14px;">${t.enrollBtn}</a>` : ''}
+          <a href="${checkoutUrl}" style="display:inline-block; padding:10px 18px; background:#1B3A6B; border-radius:8px; color:#ffffff; text-decoration:none; font-weight:600; font-size:14px;">${t.enrollBtn}</a>
         </div>`;
     }).join('');
 
