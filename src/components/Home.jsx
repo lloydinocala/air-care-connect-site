@@ -21,7 +21,7 @@ const SERVICES = [
   { icon: '🔍', title: 'Tune-Up & Maintenance', desc: '21-point inspection that catches small problems before they become expensive emergencies.' },
   { icon: '❄️', title: 'System Replacement', desc: 'Full replacement with instant online pricing. Get a guaranteed quote in 60 seconds, 24/7.' },
   { icon: '🏗️', title: 'New Installation', desc: 'New construction and add-ons. Proper sizing and commissioning guaranteed.' },
-  { icon: '💨', title: 'Indoor Air Quality', desc: 'MERV 8–13 filtration, UV treatment, and whole-home humidity control for Florida\'s climate.' },
+  { icon: '💨', title: 'Duct Cleaning & Indoor Air Quality', desc: 'MERV 8–13 filtration, UV treatment, and whole-home humidity control for Florida\'s climate.' },
   { icon: '🌡️', title: 'Heat Pump Service', desc: 'Full heat pump repair, maintenance, and replacement. R-410A and R-32 certified.' },
 ];
 
@@ -309,3 +309,4 @@ export default function Home() {
     </>
   );
 }
+
