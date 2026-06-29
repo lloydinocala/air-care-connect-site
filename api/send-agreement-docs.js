@@ -57,6 +57,10 @@ export default async function handler(req, res) {
   const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || 'quotes@air-careconnect.com';
   const FROM_NAME = process.env.SENDGRID_FROM_NAME || 'Air-Care Connect';
 
+  if (!SENDGRID_API_KEY) {
+    return res.status(500).json({ error: 'Email service not configured' });
+  }
+
   try {
     const { email, plans, language } = req.body;
     const lang = language === 'es' ? 'es' : 'en';
@@ -93,20 +97,28 @@ export default async function handler(req, res) {
       </div>`;
 
     // Send the email
-    if (SENDGRID_API_KEY) {
-      try {
-        const r = await fetch('https://api.sendgrid.com/v3/mail/send', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${SENDGRID_API_KEY}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            personalizations: [{ to: [{ email }] }],
-            from: { email: FROM_EMAIL, name: FROM_NAME },
-            subject: t.subject(validPlans.length),
-            content: [{ type: 'text/html', value: html }],
-          }),
-        });
-        if (!r.ok) console.error('SendGrid error:', await r.text());
-      } catch (e) { console.error('Customer email error:', e); }
+    let customerEmailSent = false;
+    try {
+      const r = await fetch('https://api.sendgrid.com/v3/mail/send', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${SENDGRID_API_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          personalizations: [{ to: [{ email }] }],
+          from: { email: FROM_EMAIL, name: FROM_NAME },
+          subject: t.subject(validPlans.length),
+          content: [{ type: 'text/html', value: html }],
+        }),
+      });
+      if (r.ok) {
+        customerEmailSent = true;
+      } else {
+        const errText = await r.text();
+        console.error('SendGrid error:', errText);
+        return res.status(502).json({ error: `Email provider rejected the request: ${errText}` });
+      }
+    } catch (e) {
+      console.error('Customer email error:', e);
+      return res.status(500).json({ error: 'Failed to send email' });
     }
 
     // Notify the office
