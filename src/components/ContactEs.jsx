@@ -1,1 +1,1 @@
-export { AboutEs as default } from './pages';
+export { ContactEs as default } from './pages';
