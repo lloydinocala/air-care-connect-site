@@ -1090,10 +1090,13 @@ export function AireAzul() {
               </div>
             ))}
           </div>
+          <div style={{ textAlign: 'center', marginTop: 32 }}>
+            <Link to="/aire-azul/services" className="btn btn-outline-sky btn-lg" style={{ borderColor: '#E07A5F', color: '#E07A5F' }}>
+              Ver Todos los Servicios →
+            </Link>
+          </div>
         </div>
       </section>
-
-      {/* Club Aire Azul */}
       <section style={{ background: OFF_WHITE, padding: '80px 0' }}>
         <div className="container">
           <SectionHeader eyebrow="Programa de Membresía" title="Club Aire Azul"
@@ -1136,8 +1139,11 @@ export function AireAzul() {
             ))}
           </div>
           <div style={{ textAlign: 'center' }}>
+            <Link to="/aire-azul/club" className="btn btn-lg" style={{
+              background: TERRA, color: WHITE, border: `2px solid ${TERRA}`, marginRight: 12,
+            }}>Ver Todos los Planes →</Link>
             <a href={PHONE_ES_HREF} className="btn btn-lg" style={{
-              background: TERRA, color: WHITE, border: `2px solid ${TERRA}`,
+              background: WHITE, color: TERRA, border: `2px solid ${TERRA}`,
             }}>📞 Llame para unirse: {PHONE_ES}</a>
           </div>
         </div>
@@ -1166,11 +1172,769 @@ export function AireAzul() {
 // ═══════════════════════════════════════════════════════════════
 // FOOTER
 // ═══════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════
+// SERVICIOS (Spanish mirror of Services — same structure/logic)
+// ═══════════════════════════════════════════════════════════════
+const TERRA = '#E07A5F';
+const TERRA_PALE = '#FDF0EC';
+
+const CHECKLIST_ES = [
+  'Medir el diferencial de temperatura entre el aire de suministro y retorno',
+  'Verificar las presiones del refrigerante (succión y descarga)',
+  'Inspeccionar y limpiar el serpentín evaporador',
+  'Inspeccionar y limpiar el serpentín condensador y enderezar las aletas',
+  'Despejar y enjuagar la línea de drenaje de condensado',
+  'Tratar la bandeja de drenaje con tabletas de condensado',
+  'Inspeccionar y probar el(los) capacitor(es) — medir microfaradios',
+  'Inspeccionar el contactor por picaduras y quemaduras',
+  'Probar y registrar el consumo de amperaje del compresor',
+  'Probar y registrar el consumo de amperaje del motor del soplador',
+  'Inspeccionar la rueda del soplador — limpiar si es necesario',
+  'Verificar y ajustar todas las conexiones eléctricas',
+  'Probar el funcionamiento y la calibración del termostato',
+  'Reemplazar las baterías del termostato (Nivel 2+)',
+  'Reemplazar el filtro de aire (incluido según el plan)',
+  'Inspeccionar y limpiar la bomba de condensado, si existe',
+  'Inspeccionar las conexiones accesibles del sistema de ductos',
+  'Inspeccionar la caja de desconexión — fusibles y cableado',
+  'Verificar y registrar el voltaje del sistema',
+  'Verificar el ciclo completo de enfriamiento — registrar todas las lecturas',
+  'Informe escrito del sistema entregado al propietario',
+];
+
+const SVCS_ES = [
+  {
+    icon: '🔧', title: 'Reparación de AC',
+    desc: 'Su AC eligió el peor día posible para fallar — lo sabemos. Air-Care Connect ofrece diagnóstico rápido y reparación el mismo día en la mayoría de los casos. Nuestros técnicos llevan piezas comunes en cada camión.',
+    points: ['Todas las marcas y modelos','Servicio el mismo día disponible','Precios claros antes de empezar','Sin cargos de horas extra para miembros del Club'],
+    photo: 'FOTO: Técnico reparando unidad manejadora de aire interior',
+    ctas: [
+      { label: `📞 Llame: ${PHONE_ES}`, href: PHONE_ES_HREF },
+      { label: '📅 Reservar una Visita de Servicio', href: '/aire-azul/contact', internal: true },
+    ],
+  },
+  {
+    icon: '🔍', title: 'Mantenimiento Preventivo de 21 Puntos',
+    desc: 'Nuestro mantenimiento exhaustivo es la base de todo lo que hacemos. La temporada de AC durante todo el año en Florida significa que su sistema acumula más desgaste que en casi cualquier otro lugar del país.',
+    points: ['Protocolo completo de inspección de 21 puntos','Informe escrito después de cada visita','Incluido en todos los planes del Club Aire Azul','Ventanas de programación en primavera y otoño'],
+    photo: 'FOTO: Técnico realizando mantenimiento / revisando manómetros',
+    checklist: true,
+    ctas: [
+      { label: `📞 Llame: ${PHONE_ES}`, href: PHONE_ES_HREF },
+      { label: '📅 Reservar un Mantenimiento', href: `/aire-azul/contact?issue=${encodeURIComponent('Routine Maintenance / Tune-Up')}`, internal: true },
+    ],
+  },
+  {
+    icon: '❄️', title: 'Reemplazo de Sistema',
+    desc: 'Cuando es hora de un sistema nuevo, lo hacemos simple. Use nuestra herramienta de cotización instantánea para obtener un precio garantizado en 60 segundos — o llámenos para una evaluación completa en su hogar.',
+    points: ['Cotización instantánea en línea disponible 24/7','Todas las marcas principales','Manejo de permisos incluido','Opciones de financiamiento disponibles'],
+    photo: 'FOTO: Instalación de sistema nuevo / unidad exterior siendo colocada',
+    images: [
+      '/See%20What%20a%20New%20Comfort%20System%20Could%20Cost%20for%20Your%20Home.jpg',
+      '/What%20Would%20You%20Like%20to%20Estimate.jpg',
+      '/Determining%20Your%20System%20Requirements.jpg',
+      '/Please%20Choose%20A%20Brand.jpg',
+      '/Choose%20Your%20Brand%20Family.jpg',
+      '/Your%20System%20Recommendations.jpg',
+      '/Review%20Your%20System%20Details.jpg',
+      '/Almost%20There.jpg',
+      '/Choose%20Your%20Installation%20Date.jpg',
+      '/Choose%20How%20You%20Like%20to%20Pay.jpg',
+      '/Booking%20Confirmation.jpg',
+    ],
+    ctas: [
+      { label: `📞 Llame: ${PHONE_ES}`, href: PHONE_ES_HREF },
+      { label: '⚡ Obtener Cotización Instantánea', href: 'https://systemestimate.air-careconnect.com', external: true },
+    ],
+  },
+  {
+    icon: '💨', title: 'Limpieza de Ductos y Calidad del Aire Interior',
+    desc: 'La humedad de Florida crea desafíos únicos — riesgo de moho, alérgenos en el aire, y olor a humedad son quejas comunes. Ofrecemos mejoras de filtración, sistemas UV, y deshumidificación de toda la casa.',
+    points: ['Mejoras de filtración MERV 8, 11 y 13','Instalación de luz UV germicida','Deshumidificación de toda la casa','Evaluación de limpieza de ductos'],
+    photo: 'FOTO: Filtro o equipo de calidad del aire de cerca',
+    ctas: [
+      { label: `📞 Llame: ${PHONE_ES}`, href: PHONE_ES_HREF },
+      { label: '📅 Reservar una Limpieza de Ductos', href: `/aire-azul/contact?issue=${encodeURIComponent('Duct Cleaning')}`, internal: true },
+    ],
+  },
+];
+
+export function ServicesEs() {
+  return (
+    <>
+      <PageHero
+        eyebrow="Lo Que Ofrecemos"
+        title="Servicios de HVAC"
+        subtitle="Servicios completos de aire acondicionado y bombas de calor en el Centro de Florida. Todas las marcas y modelos. Con licencia y asegurados."
+      />
+
+      {SVCS_ES.map((svc, i) => (
+        <section key={i} style={{ background: i % 2 === 0 ? WHITE : OFF_WHITE, padding: '80px 0' }}>
+          <div className="container">
+            <div style={{
+              display: 'grid', gridTemplateColumns: '1fr 1fr',
+              gap: 64, alignItems: 'center',
+            }}>
+              <div style={{ order: i % 2 === 0 ? 0 : 1 }}>
+                <div style={{ fontSize: 48, marginBottom: 16 }}>{svc.icon}</div>
+                <div style={{ width: 48, height: 4, background: TERRA, borderRadius: 2, marginBottom: 20 }} />
+                <h2 style={{
+                  fontFamily: 'Poppins, sans-serif', fontSize: 'clamp(22px,3vw,32px)',
+                  fontWeight: 700, color: NAVY, marginBottom: 16,
+                }}>{svc.title}</h2>
+                <p style={{ fontSize: 16, color: GRAY_DK, lineHeight: 1.75, marginBottom: 24 }}>{svc.desc}</p>
+                <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28 }}>
+                  {svc.points.map((p, j) => (
+                    <li key={j} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: 15, color: GRAY_DK }}>
+                      <span style={{
+                        flexShrink: 0, width: 22, height: 22,
+                        background: TERRA_PALE, color: TERRA,
+                        borderRadius: '50%', display: 'flex', alignItems: 'center',
+                        justifyContent: 'center', fontSize: 12, fontWeight: 700,
+                        marginTop: 1, border: `1px solid rgba(224,122,95,0.3)`,
+                      }}>✓</span>
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+                {svc.ctas ? (
+                  <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                    {svc.ctas.map((c, k) => (
+                      c.internal ? (
+                        <Link key={k} to={c.href} className="btn btn-navy" style={{ background: TERRA, borderColor: TERRA }}>{c.label}</Link>
+                      ) : c.external ? (
+                        <a key={k} href={c.href} target="_blank" rel="noopener noreferrer" className="btn btn-navy" style={{ background: TERRA, borderColor: TERRA }}>{c.label}</a>
+                      ) : (
+                        <a key={k} href={c.href} className="btn btn-navy" style={{ background: TERRA, borderColor: TERRA }}>{c.label}</a>
+                      )
+                    ))}
+                  </div>
+                ) : (
+                  <a href={PHONE_ES_HREF} className="btn btn-navy" style={{ background: TERRA, borderColor: TERRA }}>📞 Llame: {PHONE_ES}</a>
+                )}
+              </div>
+              <div style={{ order: i % 2 === 0 ? 1 : 0 }}>
+                {svc.images ? (
+                  <PhotoCarousel images={svc.images} />
+                ) : (
+                  <PhotoPlaceholder label={svc.photo} height={340} />
+                )}
+                {svc.checklist && (
+                  <div style={{
+                    marginTop: 20, background: WHITE,
+                    border: `1px solid ${GRAY_LT}`, borderRadius: 16, padding: 24,
+                    boxShadow: '0 2px 12px rgba(27,58,107,0.06)',
+                  }}>
+                    <div style={{
+                      fontFamily: 'Poppins, sans-serif', fontSize: 13, fontWeight: 700,
+                      textTransform: 'uppercase', letterSpacing: 2, color: TERRA, marginBottom: 16,
+                    }}>Nuestra Lista de 21 Puntos</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 12px' }}>
+                      {CHECKLIST_ES.map((item, j) => (
+                        <div key={j} style={{
+                          fontSize: 12, color: GRAY_DK,
+                          display: 'flex', gap: 6, alignItems: 'flex-start',
+                        }}>
+                          <span style={{ color: TERRA, flexShrink: 0 }}>✓</span>{item}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      ))}
+
+      {/* Club CTA */}
+      <section style={{ background: NAVY, padding: '64px 0', textAlign: 'center' }}>
+        <div className="container">
+          <h2 style={{
+            fontFamily: 'Poppins, sans-serif', fontSize: 'clamp(24px,3vw,36px)',
+            fontWeight: 800, color: WHITE, marginBottom: 16,
+          }}>Ahorre en Cada Servicio con un Plan del Club</h2>
+          <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 17, maxWidth: 480, margin: '0 auto 32px', lineHeight: 1.7 }}>
+            Los miembros reciben 10–20% de descuento en todas las reparaciones, programación prioritaria, y mantenimientos gratis. Desde $15.99/mes.
+          </p>
+          <Link to="/aire-azul/club" className="btn btn-primary btn-lg" style={{ background: TERRA, borderColor: TERRA }}>Ver Planes del Club →</Link>
+        </div>
+      </section>
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NOSOTROS (Spanish mirror of About — same structure/logic)
+// ═══════════════════════════════════════════════════════════════
+const COUNTIES_ES = ['Condado de Marion','Condado de Lake','Condado de Sumter','Condado de Levy','Condado de Citrus','Condado de Alachua','The Villages'];
+
+export function AboutEs() {
+  return (
+    <>
+      <PageHero
+        eyebrow="Nuestra Historia"
+        title="Propietarios Locales."
+        titleAccent="Servicio Real."
+        subtitle="Air-Care Connect y Aire Azul son propiedad y operados por Lloyd y Orlando — dos socios que construyeron este negocio para servir a los propietarios del Centro de Florida de la manera correcta."
+      />
+
+      <section style={{ background: WHITE, padding: '80px 0' }}>
+        <div className="container">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }}>
+            <div>
+              <div style={{ width: 48, height: 4, background: TERRA, borderRadius: 2, marginBottom: 20 }} />
+              <h2 style={{
+                fontFamily: 'Poppins, sans-serif', fontSize: 'clamp(24px,3vw,36px)',
+                fontWeight: 800, color: NAVY, marginBottom: 20,
+              }}>Por Qué Empezamos</h2>
+              <p style={{ fontSize: 16, color: GRAY_DK, lineHeight: 1.8, marginBottom: 16 }}>
+                Empezamos con una creencia simple: el servicio de HVAC en esta región tenía demasiadas
+                empresas que trataban a los clientes como una transacción. Queríamos construir algo
+                diferente — un negocio donde el propietario contesta el teléfono, los técnicos llegan
+                a tiempo, y el precio cotizado es el precio cobrado.
+              </p>
+              <p style={{ fontSize: 16, color: GRAY_DK, lineHeight: 1.8 }}>
+                Nuestra estructura de doble marca — Air-Care Connect para clientes de habla inglesa
+                y Aire Azul para clientes de habla hispana — significa que servimos a toda la comunidad
+                en nuestro territorio de seis condados con la misma calidad y profesionalismo.
+              </p>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <PhotoPlaceholder label="FOTO: Lloyd y Orlando — propietarios / foto del equipo" height={280} />
+              <PhotoPlaceholder label="FOTO: Camión de servicio / vehículo con logo" height={180} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section style={{ background: OFF_WHITE, padding: '80px 0' }}>
+        <div className="container">
+          <SectionHeader
+            eyebrow="Dónde Servimos"
+            title="Seis Condados + The Villages"
+            subtitle="Cubrimos un amplio territorio en el Centro de Florida. Si no está seguro de si servimos su área, simplemente llame — le informaremos."
+          />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16 }}>
+            {COUNTIES_ES.map((c, i) => (
+              <div key={i} style={{
+                background: WHITE, border: `1px solid ${GRAY_LT}`,
+                borderRadius: 16, padding: '24px 16px', textAlign: 'center',
+                boxShadow: '0 2px 8px rgba(27,58,107,0.06)',
+                transition: 'all 0.2s',
+              }}>
+                <div style={{ fontSize: 28, marginBottom: 8 }}>📍</div>
+                <div style={{
+                  fontFamily: 'Poppins, sans-serif', fontSize: 14, fontWeight: 700, color: NAVY,
+                }}>{c}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section style={{ background: WHITE, padding: '80px 0' }}>
+        <div className="container">
+          <SectionHeader eyebrow="Dos Marcas, Un Estándar" title="Air-Care Connect y Aire Azul" />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
+            {[
+              {
+                name: 'Aire Azul', lang: 'Español — Se habla español', phone: PHONE_ES, href: PHONE_ES_HREF,
+                color: TERRA,
+                desc: 'Sirviendo a clientes hispanohablantes en todo el territorio. El mismo nivel de servicio profesional, comunicado en su idioma. Club Aire Azul disponible.',
+              },
+              {
+                name: 'Air-Care Connect', lang: 'English', phone: PHONE_EN, href: PHONE_EN_HREF,
+                color: SKY,
+                desc: 'Sirviendo a propietarios de habla inglesa en los seis condados. Servicio el mismo día, técnicos profesionales, y el programa de membresía Air-Care Club.',
+              },
+            ].map((brand, i) => (
+              <div key={i} style={{
+                background: WHITE, border: `1px solid ${GRAY_LT}`,
+                borderTop: `4px solid ${brand.color}`,
+                borderRadius: 16, padding: 32,
+                boxShadow: '0 4px 16px rgba(27,58,107,0.08)',
+              }}>
+                <div style={{
+                  fontFamily: 'Poppins, sans-serif', fontSize: 24, fontWeight: 800,
+                  color: brand.color, marginBottom: 8,
+                }}>{brand.name}</div>
+                <span style={{
+                  display: 'inline-block', background: TERRA_PALE,
+                  color: NAVY, padding: '4px 12px', borderRadius: 999,
+                  fontSize: 12, fontWeight: 600, marginBottom: 16,
+                }}>{brand.lang}</span>
+                <p style={{ fontSize: 15, color: GRAY_DK, lineHeight: 1.7, marginBottom: 20 }}>{brand.desc}</p>
+                <a href={brand.href} style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  padding: '12px 24px', borderRadius: 10,
+                  border: `2px solid ${brand.color}`, color: brand.color,
+                  fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: 15,
+                  transition: 'all 0.2s',
+                }}>📞 {brand.phone}</a>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CONTACTO / RESERVAR UNA VISITA (Spanish mirror of Contact)
+// Reuses the SAME calendar/availability helpers as the English page
+// (getCalendarForIssue, getDaySlots, Supabase RPC) so both languages
+// share one real set of truck availability — only labels are translated.
+// ═══════════════════════════════════════════════════════════════
+const ISSUE_OPTIONS_ES = [
+  'No Cooling',
+  'No Heat',
+  'Strange Noise or Smell',
+  'Water Leak',
+  'Routine Maintenance / Tune-Up',
+  'Duct Cleaning',
+  'Indoor Air Quality / Filtration',
+  'General Question',
+  'Other',
+];
+// Spanish labels shown to the customer, keyed to the same canonical
+// English values used internally for calendar routing + admin records.
+const ISSUE_LABELS_ES = {
+  'No Cooling': 'No Enfría',
+  'No Heat': 'No Calienta',
+  'Strange Noise or Smell': 'Ruido o Olor Extraño',
+  'Water Leak': 'Fuga de Agua',
+  'Routine Maintenance / Tune-Up': 'Mantenimiento de Rutina',
+  'Duct Cleaning': 'Limpieza de Ductos',
+  'Indoor Air Quality / Filtration': 'Calidad del Aire / Filtración',
+  'General Question': 'Pregunta General',
+  'Other': 'Otro',
+};
+const TIME_OPTIONS_ES = [
+  'Morning (8am–12pm)',
+  'Afternoon (12pm–4pm)',
+  'Evening (4pm–7pm)',
+  'ASAP — today if possible',
+];
+const TIME_LABELS_ES = {
+  'Morning (8am–12pm)': 'Mañana (8am–12pm)',
+  'Afternoon (12pm–4pm)': 'Tarde (12pm–4pm)',
+  'Evening (4pm–7pm)': 'Noche (4pm–7pm)',
+  'ASAP — today if possible': 'Lo Antes Posible — hoy si es posible',
+};
+
+export function ContactEs() {
+  const location = useLocation();
+  const [mode, setMode] = useState('book');
+  const [form, setForm] = useState({
+    name: '', phone: '', email: '', address: '', issue: ISSUE_OPTIONS_ES[0], notes: '',
+  });
+  const [date, setDate] = useState('');
+  const [slot, setSlot] = useState('');
+  const [slotsLoading, setSlotsLoading] = useState(false);
+  const [daySlots, setDaySlots] = useState([]);
+  const [callbackDate, setCallbackDate] = useState('');
+  const [callbackTime, setCallbackTime] = useState(TIME_OPTIONS_ES[0]);
+  const [status, setStatus] = useState('idle');
+
+  useEffect(() => {
+    const requested = new URLSearchParams(location.search).get('issue');
+    if (requested && ISSUE_OPTIONS_ES.includes(requested)) {
+      setForm((f) => ({ ...f, issue: requested }));
+    }
+  }, [location.search]);
+
+  const update = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
+  const switchMode = (next) => { setMode(next); setStatus('idle'); };
+  const calendar = getCalendarForIssue(form.issue);
+
+  useEffect(() => {
+    if (mode !== 'book' || !date) { setDaySlots([]); setSlot(''); return; }
+    const labels = getDaySlots(date, calendar);
+    setSlot('');
+    if (labels.length === 0) { setDaySlots([]); return; }
+    let cancelled = false;
+    setSlotsLoading(true);
+    (async () => {
+      let counts = {};
+      try {
+        const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_booked_slot_counts`, {
+          method: 'POST',
+          headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ p_date: date, p_calendar: calendar }),
+        });
+        const data = await r.json();
+        if (Array.isArray(data)) data.forEach((row) => { counts[row.time_slot] = row.slot_count; });
+      } catch (e) { console.warn('Slot availability fetch error:', e); }
+      if (!cancelled) {
+        setDaySlots(labels.map((label) => ({ label, full: (counts[label] || 0) >= SLOT_CAPACITY })));
+        setSlotsLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [date, mode, calendar]);
+
+  const resetForm = () => {
+    setForm({ name: '', phone: '', email: '', address: '', issue: ISSUE_OPTIONS_ES[0], notes: '' });
+    setDate(''); setSlot(''); setDaySlots([]);
+    setCallbackDate(''); setCallbackTime(TIME_OPTIONS_ES[0]);
+  };
+
+  const handleBookSubmit = async () => {
+    if (!form.name.trim() || !form.phone.trim() || !form.address.trim() || !date || !slot) {
+      setStatus('missing');
+      return;
+    }
+    setStatus('submitting');
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/leads`, {
+        method: 'POST',
+        headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify({
+          lead_type: 'service_call_booking',
+          property_address: form.address,
+          customer_name: form.name,
+          customer_email: form.email || null,
+          customer_phone: form.phone,
+          notes: `[Sitio en español - auto-reservado]${form.notes ? ' ' + form.notes : ''}`,
+          language: 'es',
+          lead_status: 'new',
+          booking_date: date,
+          time_slot: slot,
+          booking_calendar: calendar,
+          contact_preference: form.email ? 'email' : 'phone',
+          organization_id: 1,
+        }),
+      });
+    } catch (e) { console.warn('Booking save error:', e); }
+
+    try {
+      await fetch('/api/confirm-service-call', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name, phone: form.phone, email: form.email || null,
+          address: form.address, issue: ISSUE_LABELS_ES[form.issue] || form.issue, date, slot, notes: form.notes,
+        }),
+      });
+    } catch (e) { console.warn('Confirmation send error:', e); }
+
+    setStatus('success');
+    resetForm();
+  };
+
+  const handleCallbackSubmit = async () => {
+    if (!form.name.trim() || !form.phone.trim() || !form.address.trim()) {
+      setStatus('missing');
+      return;
+    }
+    setStatus('submitting');
+
+    const summaryLine = [
+      `Asunto: ${ISSUE_LABELS_ES[form.issue] || form.issue}`,
+      callbackDate ? `Fecha preferida: ${callbackDate}` : null,
+      `Hora preferida: ${TIME_LABELS_ES[callbackTime] || callbackTime}`,
+      form.notes ? `Mensaje: ${form.notes}` : null,
+    ].filter(Boolean).join(' | ');
+
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/leads`, {
+        method: 'POST',
+        headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify({
+          lead_type: 'service_call_callback_request',
+          property_address: form.address,
+          customer_name: form.name,
+          customer_email: form.email || null,
+          customer_phone: form.phone,
+          notes: `[Sitio en español - Formulario de Contacto] ${summaryLine}`,
+          language: 'es',
+          lead_status: 'new',
+          contact_preference: form.email ? 'email' : 'phone',
+          organization_id: 1,
+        }),
+      });
+    } catch (e) { console.warn('Lead save error:', e); }
+
+    try {
+      await fetch('/api/send-email', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: 'info@air-careconnect.com',
+          subject: `📞 Solicitud de Llamada — ${form.name}`,
+          htmlContent: `
+            <div style="font-family: sans-serif; max-width: 480px;">
+              <h2 style="color: ${NAVY};">Nueva Solicitud de Llamada (Aire Azul)</h2>
+              <p><strong>Nombre:</strong> ${form.name}</p>
+              <p><strong>Teléfono:</strong> ${form.phone}</p>
+              ${form.email ? `<p><strong>Correo:</strong> ${form.email}</p>` : ''}
+              <p><strong>Dirección:</strong> ${form.address}</p>
+              <p><strong>Asunto:</strong> ${ISSUE_LABELS_ES[form.issue] || form.issue}</p>
+              ${callbackDate ? `<p><strong>Fecha Preferida:</strong> ${callbackDate}</p>` : ''}
+              <p><strong>Hora Preferida:</strong> ${TIME_LABELS_ES[callbackTime] || callbackTime}</p>
+              ${form.notes ? `<p><strong>Mensaje:</strong> ${form.notes}</p>` : ''}
+              <p style="color:#64748b; font-size:13px;">Enviado desde la página de contacto en español — nada está programado aún, el cliente quiere que le llamen.</p>
+            </div>`,
+        }),
+      });
+    } catch (e) { console.warn('Email notification error:', e); }
+
+    try {
+      await fetch('/api/send-sms', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          body: `Solicitud de llamada (Aire Azul): ${form.name}, ${form.phone}. ${ISSUE_LABELS_ES[form.issue] || form.issue}. Preferido: ${callbackDate || 'sin fecha'} - ${TIME_LABELS_ES[callbackTime] || callbackTime}. Dirección: ${form.address}`,
+        }),
+      });
+    } catch (e) { console.warn('SMS notification error:', e); }
+
+    setStatus('success');
+    resetForm();
+  };
+
+  const tabStyleEs = (active) => ({
+    flex: 1, padding: '12px 16px', borderRadius: 10, cursor: 'pointer',
+    textAlign: 'center', fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 13,
+    border: active ? `2px solid ${TERRA}` : `1px solid ${GRAY_LT}`,
+    background: active ? TERRA_PALE : WHITE, color: active ? NAVY : GRAY_DK,
+    transition: 'all 0.15s',
+  });
+
+  return (
+    <>
+      <PageHero
+        eyebrow="Contáctenos"
+        title="Contáctenos"
+        subtitle="Llame, envíe un mensaje de texto, o reserve una visita de servicio en línea. Respondemos rápido — especialmente para miembros del Club Aire Azul."
+      />
+
+      <section style={{ background: OFF_WHITE, padding: '80px 0' }}>
+        <div className="container">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              {[
+                { icon:'📞', title:'Línea en Español', value:PHONE_ES, href:PHONE_ES_HREF, sub:'Aire Azul — llame o envíe un mensaje' },
+                { icon:'📞', title:'English Line', value:PHONE_EN, href:PHONE_EN_HREF, sub:'Air-Care Connect — call or text' },
+                { icon:'⏰', title:'Horario', value:'Lun–Vie 7am–7pm | Sáb 8am–5pm', sub:'Servicio de emergencia disponible para miembros del Club' },
+                { icon:'📍', title:'Área de Servicio', value:'Ocala y Centro de Florida', sub:'Marion, Lake, Sumter, Levy, Citrus, Alachua + The Villages' },
+              ].map((item, i) => (
+                <div key={i} style={{
+                  background: WHITE, border: `1px solid ${GRAY_LT}`,
+                  borderRadius: 16, padding: '24px 28px',
+                  display: 'flex', gap: 20, alignItems: 'flex-start',
+                  boxShadow: '0 2px 8px rgba(27,58,107,0.06)',
+                }}>
+                  <div style={{
+                    width: 48, height: 48, flexShrink: 0,
+                    background: TERRA_PALE, borderRadius: 12,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22,
+                  }}>{item.icon}</div>
+                  <div>
+                    <div style={{
+                      fontFamily: 'Poppins, sans-serif', fontSize: 11,
+                      letterSpacing: 2, color: TERRA, textTransform: 'uppercase',
+                      fontWeight: 600, marginBottom: 6,
+                    }}>{item.title}</div>
+                    {item.href ? (
+                      <a href={item.href} style={{
+                        fontFamily: 'Poppins, sans-serif', fontSize: 22,
+                        fontWeight: 700, color: NAVY, display: 'block', marginBottom: 4,
+                      }}>{item.value}</a>
+                    ) : (
+                      <div style={{
+                        fontFamily: 'Poppins, sans-serif', fontSize: 16,
+                        fontWeight: 700, color: NAVY, marginBottom: 4,
+                      }}>{item.value}</div>
+                    )}
+                    <div style={{ fontSize: 13, color: GRAY }}>{item.sub}</div>
+                  </div>
+                </div>
+              ))}
+
+              <div style={{
+                background: TERRA_PALE, border: `1px solid rgba(224,122,95,0.3)`,
+                borderRadius: 16, padding: '20px 24px',
+              }}>
+                <div style={{ fontFamily:'Poppins,sans-serif', fontSize:16, fontWeight:700, color:NAVY, marginBottom:8 }}>
+                  ⭐ Miembros del Club Aire Azul
+                </div>
+                <p style={{ fontSize:14, color:GRAY_DK, lineHeight:1.6 }}>
+                  Los miembros del Club reciben respuesta prioritaria. Cuando llame, identifíquese como
+                  miembro y será movido al frente de la fila de programación — especialmente importante
+                  durante la temporada alta.
+                </p>
+              </div>
+            </div>
+
+            <div style={{
+              background: WHITE, border: `1px solid ${GRAY_LT}`,
+              borderRadius: 20, padding: 40,
+              boxShadow: '0 4px 24px rgba(27,58,107,0.08)',
+            }}>
+              <h2 style={{
+                fontFamily: 'Poppins, sans-serif', fontSize: 24,
+                fontWeight: 700, color: NAVY, marginBottom: 24,
+              }}>Reservar una Visita de Servicio</h2>
+
+              {status === 'success' ? (
+                <div style={{
+                  background: TERRA_PALE, border: `1px solid rgba(224,122,95,0.3)`,
+                  borderRadius: 14, padding: 24, textAlign: 'center',
+                }}>
+                  <div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>
+                  <div style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, color: NAVY, marginBottom: 6 }}>
+                    {mode === 'book' ? '¡Está reservado!' : '¡Solicitud recibida!'}
+                  </div>
+                  <p style={{ fontSize: 14, color: GRAY_DK, lineHeight: 1.6 }}>
+                    {mode === 'book'
+                      ? 'Revise su teléfono — un mensaje de texto confirmando su cita está en camino (y un correo también, si nos lo dio).'
+                      : 'Un miembro del equipo le llamará o enviará un mensaje de texto pronto para confirmar su cita.'}
+                  </p>
+                  <button className="btn btn-navy" style={{ marginTop: 16, background: TERRA, borderColor: TERRA }} onClick={() => setStatus('idle')}>
+                    Reservar Otra Visita
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', gap: 10, marginBottom: 24 }}>
+                    <div style={tabStyleEs(mode === 'book')} onClick={() => switchMode('book')}>
+                      📅 Reservar Mi Propia Hora
+                    </div>
+                    <div style={tabStyleEs(mode === 'callback')} onClick={() => switchMode('callback')}>
+                      📞 Que Nos Llamen
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    <div>
+                      <label style={labelStyle}>Su Nombre *</label>
+                      <input type="text" placeholder="Juan Pérez" value={form.name} onChange={update('name')} style={inputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Número de Teléfono *</label>
+                      <input type="tel" placeholder="(352) 000-0000" value={form.phone} onChange={update('phone')} style={inputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Correo Electrónico {mode === 'book' && '(para confirmación por correo también)'}</label>
+                      <input type="email" placeholder="juan@ejemplo.com" value={form.email} onChange={update('email')} style={inputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Dirección del Servicio *</label>
+                      <input type="text" placeholder="123 Calle Principal, Ocala, FL" value={form.address} onChange={update('address')} style={inputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>¿Qué Está Pasando?</label>
+                      <select value={form.issue} onChange={update('issue')} style={inputStyle}>
+                        {ISSUE_OPTIONS_ES.map((opt) => <option key={opt} value={opt}>{ISSUE_LABELS_ES[opt]}</option>)}
+                      </select>
+                    </div>
+
+                    {mode === 'book' ? (
+                      <>
+                        <div>
+                          <label style={labelStyle}>Elija una Fecha *</label>
+                          <input type="date" min={new Date().toISOString().split('T')[0]} value={date} onChange={(e) => setDate(e.target.value)} style={inputStyle} />
+                        </div>
+
+                        {date && (
+                          <div>
+                            <label style={labelStyle}>Elija una Hora *</label>
+                            {slotsLoading ? (
+                              <p style={{ fontSize: 13, color: GRAY_DK }}>Verificando disponibilidad...</p>
+                            ) : daySlots.length === 0 ? (
+                              <p style={{ fontSize: 13, color: '#C62828' }}>Estamos cerrados ese día — por favor elija otra fecha.</p>
+                            ) : (
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                                {daySlots.map((s) => (
+                                  <button
+                                    key={s.label}
+                                    type="button"
+                                    disabled={s.full}
+                                    onClick={() => setSlot(s.label)}
+                                    style={{
+                                      padding: '10px 8px', borderRadius: 10, fontSize: 13, fontWeight: 600,
+                                      cursor: s.full ? 'not-allowed' : 'pointer',
+                                      border: slot === s.label ? `2px solid ${TERRA}` : `1px solid ${GRAY_LT}`,
+                                      background: s.full ? GRAY_LT : (slot === s.label ? TERRA_PALE : WHITE),
+                                      color: s.full ? GRAY : (slot === s.label ? NAVY : GRAY_DK),
+                                    }}
+                                  >
+                                    {s.label}{s.full ? ' — Lleno' : ''}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                        <div>
+                          <label style={labelStyle}>Fecha Preferida</label>
+                          <input type="date" min={new Date().toISOString().split('T')[0]} value={callbackDate} onChange={(e) => setCallbackDate(e.target.value)} style={inputStyle} />
+                        </div>
+                        <div>
+                          <label style={labelStyle}>Hora Preferida</label>
+                          <select value={callbackTime} onChange={(e) => setCallbackTime(e.target.value)} style={inputStyle}>
+                            {TIME_OPTIONS_ES.map((opt) => <option key={opt} value={opt}>{TIME_LABELS_ES[opt]}</option>)}
+                          </select>
+                        </div>
+                      </div>
+                    )}
+
+                    <div>
+                      <label style={labelStyle}>¿Algo Más Que Debamos Saber?</label>
+                      <textarea rows={3} placeholder="Cualquier detalle adicional sobre el problema..." value={form.notes} onChange={update('notes')} style={{ ...inputStyle, resize: 'vertical' }} />
+                    </div>
+
+                    {status === 'missing' && (
+                      <p style={{ fontSize: 13, color: '#C62828', textAlign: 'center', margin: 0 }}>
+                        {mode === 'book'
+                          ? 'Por favor complete su nombre, teléfono, dirección, y elija una fecha y hora.'
+                          : 'Por favor complete su nombre, teléfono, y dirección del servicio.'}
+                      </p>
+                    )}
+
+                    <button
+                      className="btn btn-navy"
+                      style={{ width: '100%', justifyContent: 'center', marginTop: 8, opacity: status === 'submitting' ? 0.6 : 1, background: TERRA, borderColor: TERRA }}
+                      disabled={status === 'submitting'}
+                      onClick={mode === 'book' ? handleBookSubmit : handleCallbackSubmit}
+                    >
+                      {status === 'submitting' ? 'Enviando...' : (mode === 'book' ? 'Confirmar Reservación →' : 'Solicitar Llamada →')}
+                    </button>
+                    <p style={{ fontSize: 12, color: GRAY, textAlign: 'center' }}>
+                      {mode === 'book'
+                        ? 'Esto confirma su cita al instante — confirmado por mensaje de texto enseguida.'
+                        : 'Nuestro equipo confirma la hora exacta de la cita por teléfono o mensaje de texto.'}
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+
 export function Footer() {
+  const location = useLocation();
+  const isSpanish = location.pathname.startsWith('/aire-azul');
+  const accent = isSpanish ? '#E07A5F' : SKY;
+
+  const pageLinks = isSpanish
+    ? [['/aire-azul', 'Inicio'],['/aire-azul/services','Servicios'],['/aire-azul/club','Club Aire Azul'],['/aire-azul/about','Nosotros'],['/aire-azul/contact','Contacto'],['/', '🇺🇸 Air-Care Connect']]
+    : [['/', 'Home'],['/services','Services'],['/club','Air-Care Club'],['/about','About Us'],['/contact','Contact'],['/aire-azul','🇪🇸 Aire Azul']];
+
   return (
     <footer style={{
       background: NAVY,
-      borderTop: `4px solid ${SKY}`,
+      borderTop: `4px solid ${accent}`,
       padding: '64px 0 32px',
     }}>
       <div className="container">
@@ -1184,13 +1948,15 @@ export function Footer() {
             <div style={{
               fontFamily: 'Poppins, sans-serif', fontSize: 20, fontWeight: 800,
               color: WHITE, marginBottom: 4,
-            }}>Air-Care Connect</div>
+            }}>{isSpanish ? 'Aire Azul' : 'Air-Care Connect'}</div>
             <div style={{
-              fontFamily: 'Poppins, sans-serif', fontSize: 12, color: SKY,
+              fontFamily: 'Poppins, sans-serif', fontSize: 12, color: accent,
               letterSpacing: 1.5, marginBottom: 16, fontWeight: 500,
-            }}>+ Aire Azul</div>
+            }}>{isSpanish ? '+ Air-Care Connect' : '+ Aire Azul'}</div>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', lineHeight: 1.7 }}>
-              Professional HVAC service across Central Florida. Licensed, insured, and locally owned.
+              {isSpanish
+                ? 'Servicio profesional de HVAC en todo el Centro de Florida. Con licencia, asegurados, y de propiedad local.'
+                : 'Professional HVAC service across Central Florida. Licensed, insured, and locally owned.'}
             </p>
           </div>
 
@@ -1199,16 +1965,16 @@ export function Footer() {
             <div style={{
               fontFamily: 'Poppins, sans-serif', fontSize: 11, letterSpacing: 2,
               color: 'rgba(255,255,255,0.4)', marginBottom: 16, textTransform: 'uppercase', fontWeight: 600,
-            }}>Pages</div>
-            {[['/', 'Home'],['/services','Services'],['/club','Air-Care Club'],['/about','About Us'],['/contact','Contact'],['/aire-azul','🇪🇸 Aire Azul']].map(([href, label]) => (
-              <a key={href} href={href} style={{
+            }}>{isSpanish ? 'Páginas' : 'Pages'}</div>
+            {pageLinks.map(([href, label]) => (
+              <Link key={href} to={href} style={{
                 display: 'block', fontSize: 14,
                 color: 'rgba(255,255,255,0.65)', marginBottom: 10,
                 transition: 'color 0.2s',
               }}
-              onMouseEnter={e => e.target.style.color = SKY}
+              onMouseEnter={e => e.target.style.color = accent}
               onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.65)'}
-              >{label}</a>
+              >{label}</Link>
             ))}
           </div>
 
@@ -1217,24 +1983,29 @@ export function Footer() {
             <div style={{
               fontFamily: 'Poppins, sans-serif', fontSize: 11, letterSpacing: 2,
               color: 'rgba(255,255,255,0.4)', marginBottom: 16, textTransform: 'uppercase', fontWeight: 600,
-            }}>Contact</div>
+            }}>{isSpanish ? 'Contacto' : 'Contact'}</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
-                <div style={{ fontSize: 11, color: SKY, marginBottom: 3, letterSpacing: 1 }}>ENGLISH LINE</div>
-                <a href={PHONE_EN_HREF} style={{
+                <div style={{ fontSize: 11, color: accent, marginBottom: 3, letterSpacing: 1 }}>
+                  {isSpanish ? 'LÍNEA EN ESPAÑOL' : 'ENGLISH LINE'}
+                </div>
+                <a href={isSpanish ? PHONE_ES_HREF : PHONE_EN_HREF} style={{
                   fontFamily: 'Poppins, sans-serif', fontSize: 20,
                   fontWeight: 700, color: WHITE,
-                }}>{PHONE_EN}</a>
+                }}>{isSpanish ? PHONE_ES : PHONE_EN}</a>
               </div>
               <div>
-                <div style={{ fontSize: 11, color: SKY, marginBottom: 3, letterSpacing: 1 }}>LÍNEA EN ESPAÑOL</div>
-                <a href={PHONE_ES_HREF} style={{
+                <div style={{ fontSize: 11, color: accent, marginBottom: 3, letterSpacing: 1 }}>
+                  {isSpanish ? 'ENGLISH LINE' : 'LÍNEA EN ESPAÑOL'}
+                </div>
+                <a href={isSpanish ? PHONE_EN_HREF : PHONE_ES_HREF} style={{
                   fontFamily: 'Poppins, sans-serif', fontSize: 20,
                   fontWeight: 700, color: WHITE,
-                }}>{PHONE_ES}</a>
+                }}>{isSpanish ? PHONE_EN : PHONE_ES}</a>
               </div>
               <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>
-                Mon–Fri 7am–7pm<br/>Sat 8am–5pm
+                {isSpanish ? 'Lun–Vie 7am–7pm' : 'Mon–Fri 7am–7pm'}<br/>
+                {isSpanish ? 'Sáb 8am–5pm' : 'Sat 8am–5pm'}
               </div>
             </div>
           </div>
@@ -1244,13 +2015,13 @@ export function Footer() {
             <div style={{
               fontFamily: 'Poppins, sans-serif', fontSize: 11, letterSpacing: 2,
               color: 'rgba(255,255,255,0.4)', marginBottom: 16, textTransform: 'uppercase', fontWeight: 600,
-            }}>Service Area</div>
-            {COUNTIES.map(c => (
+            }}>{isSpanish ? 'Área de Servicio' : 'Service Area'}</div>
+            {(isSpanish ? COUNTIES_ES : COUNTIES).map(c => (
               <div key={c} style={{
                 fontSize: 13, color: 'rgba(255,255,255,0.55)',
                 marginBottom: 7, display: 'flex', gap: 8,
               }}>
-                <span style={{ color: SKY }}>▸</span> {c}
+                <span style={{ color: accent }}>▸</span> {c}
               </div>
             ))}
           </div>
@@ -1264,14 +2035,14 @@ export function Footer() {
           alignItems: 'center', flexWrap: 'wrap', gap: 12,
         }}>
           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
-            © {new Date().getFullYear()} Air-Care Connect / Aire Azul. All rights reserved.
+            © {new Date().getFullYear()} Air-Care Connect / Aire Azul. {isSpanish ? 'Todos los derechos reservados.' : 'All rights reserved.'}
           </div>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <span style={{
               background: 'rgba(56,161,105,0.15)', color: '#68D391',
               border: '1px solid rgba(56,161,105,0.3)',
               padding: '4px 12px', borderRadius: 999, fontSize: 12, fontWeight: 600,
-            }}>✓ Licensed & Insured</span>
+            }}>✓ {isSpanish ? 'Con Licencia y Asegurados' : 'Licensed & Insured'}</span>
             <span style={{
               background: `rgba(77,184,232,0.15)`, color: SKY,
               border: `1px solid rgba(77,184,232,0.3)`,
@@ -1284,5 +2055,6 @@ export function Footer() {
     </footer>
   );
 }
+
 
 
