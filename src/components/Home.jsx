@@ -95,7 +95,7 @@ export default function Home() {
             {/* Right: photo — hidden on mobile via CSS */}
             <div style={{ position: 'relative' }}>
               <img
-                src="/hero-technician.jpg"
+                src="/technician.jpg"
                 alt="Air-Care Connect technician servicing an outdoor AC unit in Central Florida"
                 style={{
                   width: '100%', height: 480, objectFit: 'cover',
