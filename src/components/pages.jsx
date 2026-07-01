@@ -307,6 +307,17 @@ const SVCS = [
 ];
 
 export function Services() {
+  const { hash } = useLocation();
+
+  useEffect(() => {
+    if (!hash) return;
+    const el = document.querySelector(hash);
+    if (!el) return;
+    // Small delay lets the page finish rendering before scrolling
+    const t = setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+    return () => clearTimeout(t);
+  }, [hash]);
+
   return (
     <>
       <PageHero
@@ -2081,6 +2092,9 @@ export function Footer() {
     </footer>
   );
 }
+
+
+
 
 
 
