@@ -225,6 +225,7 @@ const CHECKLIST = [
 
 const SVCS = [
   {
+    id: 'ac-repair',
     icon: '🔧', title: 'AC Repair',
     desc: 'Your AC chose the worst possible day to break down — we know. Air-Care Connect offers fast diagnosis and same-day repair for most issues. Our technicians carry common parts on every truck.',
     points: ['All makes and models','Same-day service available','Upfront pricing before we start','No overtime charges for Club members'],
@@ -235,6 +236,7 @@ const SVCS = [
     ],
   },
   {
+    id: 'tune-up',
     icon: '🔍', title: '21-Point Maintenance Tune-Up',
     desc: 'Our thorough tune-up is the foundation of everything we do. Florida\'s year-round AC season means your system accumulates more wear than almost anywhere in the country.',
     points: ['Full 21-point inspection protocol','Written report after every visit','Included in all Air-Care Club plans','Spring and fall scheduling windows'],
@@ -246,6 +248,7 @@ const SVCS = [
     ],
   },
   {
+    id: 'system-replacement',
     icon: '❄️', title: 'System Replacement',
     desc: 'When it\'s time for a new system, we make it simple. Use our instant quote tool to get a guaranteed price in 60 seconds — or call us for a full in-home assessment.',
     points: ['Instant online quote available 24/7','All major brands','Permit handling included','Financing options available'],
@@ -269,6 +272,18 @@ const SVCS = [
     ],
   },
   {
+    id: 'new-installation',
+    icon: '🏗️', title: 'New Installation',
+    desc: 'Installing HVAC in new construction or an addition? We handle proper load calculations, equipment selection, and commissioning from the ground up. We provide Energy Calculations for new residential construction.',
+    points: ['New residential construction','Room additions and conversions','Proper Manual J load calculations','Full commissioning and testing'],
+    photo: 'PHOTO: New construction installation',
+    ctas: [
+      { label: `📞 Call: ${PHONE_EN}`, href: PHONE_EN_HREF },
+      { label: '📅 Schedule a Consultation', href: '/contact', internal: true },
+    ],
+  },
+  {
+    id: 'duct-cleaning',
     icon: '💨', title: 'Duct Cleaning & Indoor Air Quality',
     desc: 'Florida\'s humidity creates unique challenges — mold risk, airborne allergens, and musty air are common complaints. We offer filtration upgrades, UV systems, and whole-home dehumidification.',
     points: ['MERV 8, 11, and 13 filtration upgrades','UV germicidal light installation','Whole-home dehumidification','Duct cleaning assessment'],
@@ -276,6 +291,17 @@ const SVCS = [
     ctas: [
       { label: `📞 Call: ${PHONE_EN}`, href: PHONE_EN_HREF },
       { label: '📅 Book a Duct Cleaning', href: `/contact?issue=${encodeURIComponent('Duct Cleaning')}`, internal: true },
+    ],
+  },
+  {
+    id: 'heat-pump',
+    icon: '🌡️', title: 'Heat Pump Service',
+    desc: 'Full heat pump repair, maintenance, and replacement. R-410A, R-32, R-22, R-12, and R-454B certified.',
+    points: ['All heat pump makes and models','Refrigerant recovery and recharge','Reverse cycle / heating mode service','Replacement and upgrade options'],
+    photo: 'PHOTO: Heat pump outdoor unit',
+    ctas: [
+      { label: `📞 Call: ${PHONE_EN}`, href: PHONE_EN_HREF },
+      { label: '📅 Book a Service Call', href: '/contact', internal: true },
     ],
   },
 ];
@@ -290,7 +316,7 @@ export function Services() {
       />
 
       {SVCS.map((svc, i) => (
-        <section key={i} style={{ background: i % 2 === 0 ? WHITE : OFF_WHITE, padding: '80px 0' }}>
+        <section key={i} id={svc.id} style={{ background: i % 2 === 0 ? WHITE : OFF_WHITE, padding: '80px 0' }}>
           <div className="container">
             <div style={{
               display: 'grid', gridTemplateColumns: '1fr 1fr',
@@ -2055,6 +2081,8 @@ export function Footer() {
     </footer>
   );
 }
+
+
 
 
 
