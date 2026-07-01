@@ -94,10 +94,14 @@ export default function Home() {
 
             {/* Right: photo — hidden on mobile via CSS */}
             <div style={{ position: 'relative' }}>
-              <PhotoPlaceholder
-                label="HERO PHOTO: Technician at outdoor AC unit"
-                height={480}
-                style={{ borderRadius: 20, boxShadow: '0 20px 60px rgba(27,58,107,0.15)' }}
+              <img
+                src="/hero-technician.jpg"
+                alt="Air-Care Connect technician servicing an outdoor AC unit in Central Florida"
+                style={{
+                  width: '100%', height: 480, objectFit: 'cover',
+                  borderRadius: 20, boxShadow: '0 20px 60px rgba(27,58,107,0.15)',
+                  display: 'block',
+                }}
               />
               <div className="hero-float-card" style={{
                 position: 'absolute', bottom: -20, left: -20,
