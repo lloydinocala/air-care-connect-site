@@ -17,12 +17,12 @@ function PhotoPlaceholder({ label, height = 400, style = {} }) {
 }
 
 const SERVICES = [
-  { icon: '🔧', title: 'AC Repair', desc: 'Fast diagnosis and same-day repair on most issues. All makes and models. Upfront pricing before we start.' },
-  { icon: '🔍', title: 'Tune-Up & Maintenance', desc: '21-point inspection that catches small problems before they become expensive emergencies.' },
-  { icon: '❄️', title: 'System Replacement', desc: 'Full replacement with instant online pricing. Get a guaranteed quote in 60 seconds, 24/7.' },
-  { icon: '🏗️', title: 'New Installation', desc: 'New construction and add-ons. Proper sizing and commissioning guaranteed.' },
-  { icon: '💨', title: 'Duct Cleaning & Indoor Air Quality', desc: 'MERV 8–13 filtration, UV treatment, and whole-home humidity control for Florida\'s climate.' },
-  { icon: '🌡️', title: 'Heat Pump Service', desc: 'Full heat pump repair, maintenance, and replacement. R-410A and R-32 certified.' },
+  { icon: '🔧', title: 'AC Repair', desc: 'Fast diagnosis and same-day repair on most issues. All makes and models. Upfront pricing before we start.', href: '/services#ac-repair' },
+  { icon: '🔍', title: 'Tune-Up & Maintenance', desc: '21-point inspection that catches small problems before they become expensive emergencies.', href: '/services#tune-up' },
+  { icon: '❄️', title: 'System Replacement', desc: 'Full replacement with instant online pricing. Get a guaranteed quote in 60 seconds, 24/7.', href: '/services#system-replacement' },
+  { icon: '🏗️', title: 'New Installation', desc: 'New construction and add-ons. Proper sizing and commissioning guaranteed. We provide Energy Calculations for new residential construction.', href: '/services#new-installation' },
+  { icon: '💨', title: 'Duct Cleaning & Indoor Air Quality', desc: 'MERV 8–13 filtration, UV treatment, and whole-home humidity control for Florida\'s climate.', href: '/services#duct-cleaning' },
+  { icon: '🌡️', title: 'Heat Pump Service', desc: 'Full heat pump repair, maintenance, and replacement. R-410A, R-32, R-22, R-12, and R-454B certified.', href: '/services#heat-pump' },
 ];
 
 const STATS = [
@@ -180,17 +180,22 @@ export default function Home() {
             gap:20,
           }}>
             {SERVICES.map((s, i) => (
-              <div key={i} className="card" style={{ display:'flex', gap:16 }}>
-                <div style={{
-                  width:52, height:52, flexShrink:0,
-                  background:'#E8F6FC', borderRadius:12,
-                  display:'flex', alignItems:'center', justifyContent:'center', fontSize:26,
-                }}>{s.icon}</div>
-                <div>
-                  <h3 style={{ fontFamily:'Poppins,sans-serif', fontSize:17, fontWeight:700, color:'#1B3A6B', marginBottom:8 }}>{s.title}</h3>
-                  <p style={{ fontSize:14, color:'#4A5568', lineHeight:1.6 }}>{s.desc}</p>
+              <Link key={i} to={s.href} style={{ textDecoration: 'none' }}>
+                <div className="card" style={{ display:'flex', gap:16, cursor:'pointer', transition:'box-shadow 0.2s, transform 0.2s' }}
+                  onMouseEnter={e => { e.currentTarget.style.boxShadow='0 8px 32px rgba(27,58,107,0.15)'; e.currentTarget.style.transform='translateY(-2px)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.boxShadow=''; e.currentTarget.style.transform=''; }}
+                >
+                  <div style={{
+                    width:52, height:52, flexShrink:0,
+                    background:'#E8F6FC', borderRadius:12,
+                    display:'flex', alignItems:'center', justifyContent:'center', fontSize:26,
+                  }}>{s.icon}</div>
+                  <div>
+                    <h3 style={{ fontFamily:'Poppins,sans-serif', fontSize:17, fontWeight:700, color:'#1B3A6B', marginBottom:8 }}>{s.title}</h3>
+                    <p style={{ fontSize:14, color:'#4A5568', lineHeight:1.6 }}>{s.desc}</p>
+                  </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
           <div style={{ textAlign:'center', marginTop:40 }}>
