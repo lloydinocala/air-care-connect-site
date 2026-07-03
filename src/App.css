@@ -358,9 +358,14 @@ main { flex: 1; }
     overflow-x: auto !important;
   }
 
-  /* Services photo order fix */
-  .svc-photo { order: 0 !important; }
-  .svc-content { order: 1 !important; }
+  /* Services — stack vertically on mobile: heading/description/buttons
+     first, photo second — regardless of desktop zigzag side. */
+  .svc-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+  .svc-content { order: 0 !important; }
+  .svc-photo { order: 1 !important; width: 100% !important; }
 
   /* AireAzul plan cards */
   .aire-plan-grid {
@@ -396,4 +401,5 @@ main { flex: 1; }
     border-radius: 0;
   }
 }
+
 
