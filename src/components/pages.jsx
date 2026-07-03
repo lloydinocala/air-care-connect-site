@@ -329,11 +329,11 @@ export function Services() {
       {SVCS.map((svc, i) => (
         <section key={i} id={svc.id} style={{ background: i % 2 === 0 ? WHITE : OFF_WHITE, padding: '80px 0' }}>
           <div className="container">
-            <div style={{
+            <div className="svc-grid" style={{
               display: 'grid', gridTemplateColumns: '1fr 1fr',
               gap: 64, alignItems: 'center',
             }}>
-              <div style={{ order: i % 2 === 0 ? 0 : 1 }}>
+              <div className="svc-content" style={{ order: i % 2 === 0 ? 0 : 1 }}>
                 <div style={{ fontSize: 48, marginBottom: 16 }}>{svc.icon}</div>
                 <div style={{ width: 48, height: 4, background: SKY, borderRadius: 2, marginBottom: 20 }} />
                 <h2 style={{
@@ -374,7 +374,7 @@ export function Services() {
                   <a href={PHONE_EN_HREF} className="btn btn-navy">📞 Schedule: {PHONE_EN}</a>
                 )}
               </div>
-              <div style={{ order: i % 2 === 0 ? 1 : 0 }}>
+              <div className="svc-photo" style={{ order: i % 2 === 0 ? 1 : 0 }}>
                 {svc.images ? (
                   <PhotoCarousel images={svc.images} />
                 ) : (
@@ -1309,11 +1309,11 @@ export function ServicesEs() {
       {SVCS_ES.map((svc, i) => (
         <section key={i} style={{ background: i % 2 === 0 ? WHITE : OFF_WHITE, padding: '80px 0' }}>
           <div className="container">
-            <div style={{
+            <div className="svc-grid" style={{
               display: 'grid', gridTemplateColumns: '1fr 1fr',
               gap: 64, alignItems: 'center',
             }}>
-              <div style={{ order: i % 2 === 0 ? 0 : 1 }}>
+              <div className="svc-content" style={{ order: i % 2 === 0 ? 0 : 1 }}>
                 <div style={{ fontSize: 48, marginBottom: 16 }}>{svc.icon}</div>
                 <div style={{ width: 48, height: 4, background: TERRA, borderRadius: 2, marginBottom: 20 }} />
                 <h2 style={{
@@ -1351,7 +1351,7 @@ export function ServicesEs() {
                   <a href={PHONE_ES_HREF} className="btn btn-navy" style={{ background: TERRA, borderColor: TERRA }}>📞 Llame: {PHONE_ES}</a>
                 )}
               </div>
-              <div style={{ order: i % 2 === 0 ? 1 : 0 }}>
+              <div className="svc-photo" style={{ order: i % 2 === 0 ? 1 : 0 }}>
                 {svc.images ? (
                   <PhotoCarousel images={svc.images} />
                 ) : (
@@ -2092,6 +2092,16 @@ export function Footer() {
     </footer>
   );
 }
+
+
+
+
+
+
+
+
+
+
 
 
 
