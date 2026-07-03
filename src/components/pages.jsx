@@ -443,7 +443,7 @@ export function About() {
       {/* Story section */}
       <section style={{ background: WHITE, padding: '80px 0' }}>
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }}>
+          <div className="two-col-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }}>
             <div>
               <div style={{ width: 48, height: 4, background: SKY, borderRadius: 2, marginBottom: 20 }} />
               <h2 style={{
@@ -500,7 +500,7 @@ export function About() {
       <section style={{ background: WHITE, padding: '80px 0' }}>
         <div className="container">
           <SectionHeader eyebrow="Two Brands, One Standard" title="Air-Care Connect & Aire Azul" />
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
+          <div className="two-col-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
             {[
               {
                 name: 'Air-Care Connect', lang: 'English', phone: PHONE_EN, href: PHONE_EN_HREF,
@@ -836,7 +836,7 @@ export function Contact() {
 
       <section style={{ background: OFF_WHITE, padding: '80px 0' }}>
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
+          <div className="two-col-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
 
             {/* Contact info cards */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -1419,7 +1419,7 @@ export function AboutEs() {
 
       <section style={{ background: WHITE, padding: '80px 0' }}>
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }}>
+          <div className="two-col-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }}>
             <div>
               <div style={{ width: 48, height: 4, background: TERRA, borderRadius: 2, marginBottom: 20 }} />
               <h2 style={{
@@ -1474,7 +1474,7 @@ export function AboutEs() {
       <section style={{ background: WHITE, padding: '80px 0' }}>
         <div className="container">
           <SectionHeader eyebrow="Dos Marcas, Un Estándar" title="Air-Care Connect y Aire Azul" />
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
+          <div className="two-col-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
             {[
               {
                 name: 'Aire Azul', lang: 'Español — Se habla español', phone: PHONE_ES, href: PHONE_ES_HREF,
@@ -1748,7 +1748,7 @@ export function ContactEs() {
 
       <section style={{ background: OFF_WHITE, padding: '80px 0' }}>
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
+          <div className="two-col-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               {[
@@ -2092,6 +2092,27 @@ export function Footer() {
     </footer>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
