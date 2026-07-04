@@ -225,7 +225,6 @@ const CHECKLIST = [
 
 const SVCS = [
   {
-    id: 'ac-repair',
     icon: '🔧', title: 'AC Repair',
     desc: 'Your AC chose the worst possible day to break down — we know. Air-Care Connect offers fast diagnosis and same-day repair for most issues. Our technicians carry common parts on every truck.',
     points: ['All makes and models','Same-day service available','Upfront pricing before we start','No overtime charges for Club members'],
@@ -236,7 +235,6 @@ const SVCS = [
     ],
   },
   {
-    id: 'tune-up',
     icon: '🔍', title: '21-Point Maintenance Tune-Up',
     desc: 'Our thorough tune-up is the foundation of everything we do. Florida\'s year-round AC season means your system accumulates more wear than almost anywhere in the country.',
     points: ['Full 21-point inspection protocol','Written report after every visit','Included in all Air-Care Club plans','Spring and fall scheduling windows'],
@@ -248,7 +246,6 @@ const SVCS = [
     ],
   },
   {
-    id: 'system-replacement',
     icon: '❄️', title: 'System Replacement',
     desc: 'When it\'s time for a new system, we make it simple. Use our instant quote tool to get a guaranteed price in 60 seconds — or call us for a full in-home assessment.',
     points: ['Instant online quote available 24/7','All major brands','Permit handling included','Financing options available'],
@@ -272,18 +269,6 @@ const SVCS = [
     ],
   },
   {
-    id: 'new-installation',
-    icon: '🏗️', title: 'New Installation',
-    desc: 'Installing HVAC in new construction or an addition? We handle proper load calculations, equipment selection, and commissioning from the ground up. We provide Energy Calculations for new residential construction.',
-    points: ['New residential construction','Room additions and conversions','Proper Manual J load calculations','Full commissioning and testing'],
-    photo: 'PHOTO: New construction installation',
-    ctas: [
-      { label: `📞 Call: ${PHONE_EN}`, href: PHONE_EN_HREF },
-      { label: '📅 Schedule a Consultation', href: '/contact', internal: true },
-    ],
-  },
-  {
-    id: 'duct-cleaning',
     icon: '💨', title: 'Duct Cleaning & Indoor Air Quality',
     desc: 'Florida\'s humidity creates unique challenges — mold risk, airborne allergens, and musty air are common complaints. We offer filtration upgrades, UV systems, and whole-home dehumidification.',
     points: ['MERV 8, 11, and 13 filtration upgrades','UV germicidal light installation','Whole-home dehumidification','Duct cleaning assessment'],
@@ -293,31 +278,9 @@ const SVCS = [
       { label: '📅 Book a Duct Cleaning', href: `/contact?issue=${encodeURIComponent('Duct Cleaning')}`, internal: true },
     ],
   },
-  {
-    id: 'heat-pump',
-    icon: '🌡️', title: 'Heat Pump Service',
-    desc: 'Full heat pump repair, maintenance, and replacement. R-410A, R-32, R-22, R-12, and R-454B certified.',
-    points: ['All heat pump makes and models','Refrigerant recovery and recharge','Reverse cycle / heating mode service','Replacement and upgrade options'],
-    photo: 'PHOTO: Heat pump outdoor unit',
-    ctas: [
-      { label: `📞 Call: ${PHONE_EN}`, href: PHONE_EN_HREF },
-      { label: '📅 Book a Service Call', href: '/contact', internal: true },
-    ],
-  },
 ];
 
 export function Services() {
-  const { hash } = useLocation();
-
-  useEffect(() => {
-    if (!hash) return;
-    const el = document.querySelector(hash);
-    if (!el) return;
-    // Small delay lets the page finish rendering before scrolling
-    const t = setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
-    return () => clearTimeout(t);
-  }, [hash]);
-
   return (
     <>
       <PageHero
@@ -327,13 +290,13 @@ export function Services() {
       />
 
       {SVCS.map((svc, i) => (
-        <section key={i} id={svc.id} style={{ background: i % 2 === 0 ? WHITE : OFF_WHITE, padding: '80px 0' }}>
+        <section key={i} style={{ background: i % 2 === 0 ? WHITE : OFF_WHITE, padding: '80px 0' }}>
           <div className="container">
-            <div className="svc-grid" style={{
+            <div style={{
               display: 'grid', gridTemplateColumns: '1fr 1fr',
               gap: 64, alignItems: 'center',
             }}>
-              <div className="svc-content" style={{ order: i % 2 === 0 ? 0 : 1 }}>
+              <div style={{ order: i % 2 === 0 ? 0 : 1 }}>
                 <div style={{ fontSize: 48, marginBottom: 16 }}>{svc.icon}</div>
                 <div style={{ width: 48, height: 4, background: SKY, borderRadius: 2, marginBottom: 20 }} />
                 <h2 style={{
@@ -374,7 +337,7 @@ export function Services() {
                   <a href={PHONE_EN_HREF} className="btn btn-navy">📞 Schedule: {PHONE_EN}</a>
                 )}
               </div>
-              <div className="svc-photo" style={{ order: i % 2 === 0 ? 1 : 0 }}>
+              <div style={{ order: i % 2 === 0 ? 1 : 0 }}>
                 {svc.images ? (
                   <PhotoCarousel images={svc.images} />
                 ) : (
@@ -443,7 +406,7 @@ export function About() {
       {/* Story section */}
       <section style={{ background: WHITE, padding: '80px 0' }}>
         <div className="container">
-          <div className="two-col-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }}>
             <div>
               <div style={{ width: 48, height: 4, background: SKY, borderRadius: 2, marginBottom: 20 }} />
               <h2 style={{
@@ -500,7 +463,7 @@ export function About() {
       <section style={{ background: WHITE, padding: '80px 0' }}>
         <div className="container">
           <SectionHeader eyebrow="Two Brands, One Standard" title="Air-Care Connect & Aire Azul" />
-          <div className="two-col-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
             {[
               {
                 name: 'Air-Care Connect', lang: 'English', phone: PHONE_EN, href: PHONE_EN_HREF,
@@ -649,8 +612,7 @@ export function Contact() {
   const [callbackDate, setCallbackDate] = useState('');
   const [callbackTime, setCallbackTime] = useState(TIME_OPTIONS[0]);
   const [status, setStatus] = useState('idle'); // idle | missing | submitting | success
-
-  // Arriving from a "Book a Service Call" button on the Services page —
+  const [smsConsent, setSmsConsent] = useState(false);
   // pre-select the matching issue so people don't have to re-pick it.
   useEffect(() => {
     const requested = new URLSearchParams(location.search).get('issue');
@@ -703,11 +665,12 @@ export function Contact() {
   const resetForm = () => {
     setForm({ name: '', phone: '', email: '', address: '', issue: ISSUE_OPTIONS[0], notes: '' });
     setDate(''); setSlot(''); setDaySlots([]);
-    setCallbackDate(''); setCallbackTime(TIME_OPTIONS[0]);
+    setDate(''); setSlot(''); setDaySlots([]);
+    setCallbackDate(''); setCallbackTime(TIME_OPTIONS[0]); setSmsConsent(false);
   };
 
   const handleBookSubmit = async () => {
-    if (!form.name.trim() || !form.phone.trim() || !form.address.trim() || !date || !slot) {
+    if (!form.name.trim() || !form.phone.trim() || !form.address.trim() || !date || !slot || !smsConsent) {
       setStatus('missing');
       return;
     }
@@ -750,7 +713,7 @@ export function Contact() {
   };
 
   const handleCallbackSubmit = async () => {
-    if (!form.name.trim() || !form.phone.trim() || !form.address.trim()) {
+    if (!form.name.trim() || !form.phone.trim() || !form.address.trim() || !smsConsent) {
       setStatus('missing');
       return;
     }
@@ -836,7 +799,7 @@ export function Contact() {
 
       <section style={{ background: OFF_WHITE, padding: '80px 0' }}>
         <div className="container">
-          <div className="two-col-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
 
             {/* Contact info cards */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -1015,11 +978,40 @@ export function Contact() {
                       <textarea rows={3} placeholder="Any extra details about the issue..." value={form.notes} onChange={update('notes')} style={{ ...inputStyle, resize: 'vertical' }} />
                     </div>
 
+                    {/* SMS Consent — required by Twilio */}
+                    <label style={{
+                      display: 'flex', gap: 12, alignItems: 'flex-start',
+                      padding: '14px 16px',
+                      background: smsConsent ? '#F0FFF4' : '#FFF8F0',
+                      border: `1px solid ${smsConsent ? 'rgba(56,161,105,0.3)' : 'rgba(249,168,37,0.4)'}`,
+                      borderRadius: 10, cursor: 'pointer',
+                    }}>
+                      <input
+                        type="checkbox"
+                        checked={smsConsent}
+                        onChange={(e) => setSmsConsent(e.target.checked)}
+                        style={{ marginTop: 2, width: 16, height: 16, flexShrink: 0, accentColor: '#1B3A6B' }}
+                      />
+                      <span style={{ fontSize: 12, color: GRAY_DK, lineHeight: 1.6 }}>
+                        I agree to receive text messages from Air-Care Connect about my appointment,
+                        including scheduling confirmations and updates. Message and data rates may apply.
+                        Reply STOP to opt out.{' '}
+                        <a
+                          href="https://systemestimate.air-careconnect.com/privacy.html"
+                          target="_blank" rel="noopener noreferrer"
+                          style={{ color: SKY, textDecoration: 'underline' }}
+                          onClick={(e) => e.stopPropagation()}
+                        >View Privacy Policy</a>
+                      </span>
+                    </label>
+
                     {status === 'missing' && (
                       <p style={{ fontSize: 13, color: '#C62828', textAlign: 'center', margin: 0 }}>
-                        {mode === 'book'
-                          ? 'Please fill in your name, phone, address, and pick a date and time.'
-                          : 'Please fill in your name, phone number, and service address.'}
+                        {!smsConsent
+                          ? 'Please check the SMS consent box to continue.'
+                          : mode === 'book'
+                            ? 'Please fill in your name, phone, address, and pick a date and time.'
+                            : 'Please fill in your name, phone number, and service address.'}
                       </p>
                     )}
 
@@ -1309,11 +1301,11 @@ export function ServicesEs() {
       {SVCS_ES.map((svc, i) => (
         <section key={i} style={{ background: i % 2 === 0 ? WHITE : OFF_WHITE, padding: '80px 0' }}>
           <div className="container">
-            <div className="svc-grid" style={{
+            <div style={{
               display: 'grid', gridTemplateColumns: '1fr 1fr',
               gap: 64, alignItems: 'center',
             }}>
-              <div className="svc-content" style={{ order: i % 2 === 0 ? 0 : 1 }}>
+              <div style={{ order: i % 2 === 0 ? 0 : 1 }}>
                 <div style={{ fontSize: 48, marginBottom: 16 }}>{svc.icon}</div>
                 <div style={{ width: 48, height: 4, background: TERRA, borderRadius: 2, marginBottom: 20 }} />
                 <h2 style={{
@@ -1351,7 +1343,7 @@ export function ServicesEs() {
                   <a href={PHONE_ES_HREF} className="btn btn-navy" style={{ background: TERRA, borderColor: TERRA }}>📞 Llame: {PHONE_ES}</a>
                 )}
               </div>
-              <div className="svc-photo" style={{ order: i % 2 === 0 ? 1 : 0 }}>
+              <div style={{ order: i % 2 === 0 ? 1 : 0 }}>
                 {svc.images ? (
                   <PhotoCarousel images={svc.images} />
                 ) : (
@@ -1419,7 +1411,7 @@ export function AboutEs() {
 
       <section style={{ background: WHITE, padding: '80px 0' }}>
         <div className="container">
-          <div className="two-col-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }}>
             <div>
               <div style={{ width: 48, height: 4, background: TERRA, borderRadius: 2, marginBottom: 20 }} />
               <h2 style={{
@@ -1474,7 +1466,7 @@ export function AboutEs() {
       <section style={{ background: WHITE, padding: '80px 0' }}>
         <div className="container">
           <SectionHeader eyebrow="Dos Marcas, Un Estándar" title="Air-Care Connect y Aire Azul" />
-          <div className="two-col-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
             {[
               {
                 name: 'Aire Azul', lang: 'Español — Se habla español', phone: PHONE_ES, href: PHONE_ES_HREF,
@@ -1575,6 +1567,7 @@ export function ContactEs() {
   const [callbackDate, setCallbackDate] = useState('');
   const [callbackTime, setCallbackTime] = useState(TIME_OPTIONS_ES[0]);
   const [status, setStatus] = useState('idle');
+  const [smsConsent, setSmsConsent] = useState(false);
 
   useEffect(() => {
     const requested = new URLSearchParams(location.search).get('issue');
@@ -1616,11 +1609,12 @@ export function ContactEs() {
   const resetForm = () => {
     setForm({ name: '', phone: '', email: '', address: '', issue: ISSUE_OPTIONS_ES[0], notes: '' });
     setDate(''); setSlot(''); setDaySlots([]);
-    setCallbackDate(''); setCallbackTime(TIME_OPTIONS_ES[0]);
+    setDate(''); setSlot(''); setDaySlots([]);
+    setCallbackDate(''); setCallbackTime(TIME_OPTIONS_ES[0]); setSmsConsent(false);
   };
 
   const handleBookSubmit = async () => {
-    if (!form.name.trim() || !form.phone.trim() || !form.address.trim() || !date || !slot) {
+    if (!form.name.trim() || !form.phone.trim() || !form.address.trim() || !date || !slot || !smsConsent) {
       setStatus('missing');
       return;
     }
@@ -1662,7 +1656,7 @@ export function ContactEs() {
   };
 
   const handleCallbackSubmit = async () => {
-    if (!form.name.trim() || !form.phone.trim() || !form.address.trim()) {
+    if (!form.name.trim() || !form.phone.trim() || !form.address.trim() || !smsConsent) {
       setStatus('missing');
       return;
     }
@@ -1748,7 +1742,7 @@ export function ContactEs() {
 
       <section style={{ background: OFF_WHITE, padding: '80px 0' }}>
         <div className="container">
-          <div className="two-col-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40 }}>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               {[
@@ -1926,11 +1920,40 @@ export function ContactEs() {
                       <textarea rows={3} placeholder="Cualquier detalle adicional sobre el problema..." value={form.notes} onChange={update('notes')} style={{ ...inputStyle, resize: 'vertical' }} />
                     </div>
 
+                    {/* Consentimiento de SMS — requerido por Twilio */}
+                    <label style={{
+                      display: 'flex', gap: 12, alignItems: 'flex-start',
+                      padding: '14px 16px',
+                      background: smsConsent ? '#F0FFF4' : '#FFF8F0',
+                      border: `1px solid ${smsConsent ? 'rgba(56,161,105,0.3)' : 'rgba(224,122,95,0.4)'}`,
+                      borderRadius: 10, cursor: 'pointer',
+                    }}>
+                      <input
+                        type="checkbox"
+                        checked={smsConsent}
+                        onChange={(e) => setSmsConsent(e.target.checked)}
+                        style={{ marginTop: 2, width: 16, height: 16, flexShrink: 0, accentColor: '#1B3A6B' }}
+                      />
+                      <span style={{ fontSize: 12, color: GRAY_DK, lineHeight: 1.6 }}>
+                        Acepto recibir mensajes de texto de Air-Care Connect sobre mi cita,
+                        incluyendo confirmaciones de programación y actualizaciones. Pueden aplicarse
+                        cargos por mensajes y datos. Responda STOP para cancelar su suscripción.{' '}
+                        <a
+                          href="https://systemestimate.air-careconnect.com/privacy.html"
+                          target="_blank" rel="noopener noreferrer"
+                          style={{ color: TERRA, textDecoration: 'underline' }}
+                          onClick={(e) => e.stopPropagation()}
+                        >Ver Política de Privacidad</a>
+                      </span>
+                    </label>
+
                     {status === 'missing' && (
                       <p style={{ fontSize: 13, color: '#C62828', textAlign: 'center', margin: 0 }}>
-                        {mode === 'book'
-                          ? 'Por favor complete su nombre, teléfono, dirección, y elija una fecha y hora.'
-                          : 'Por favor complete su nombre, teléfono, y dirección del servicio.'}
+                        {!smsConsent
+                          ? 'Por favor marque la casilla de consentimiento de SMS para continuar.'
+                          : mode === 'book'
+                            ? 'Por favor complete su nombre, teléfono, dirección, y elija una fecha y hora.'
+                            : 'Por favor complete su nombre, teléfono, y dirección del servicio.'}
                       </p>
                     )}
 
@@ -2092,6 +2115,8 @@ export function Footer() {
     </footer>
   );
 }
+
+
 
 
 
