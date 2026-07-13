@@ -11,8 +11,13 @@ const GRAY_DK = '#4A5568';
 const GOLD = '#F9A825';
 const GREEN = '#38A169';
 
+const JOURNEY_FUNCTIONS_URL = 'https://gatndtsmjrxdgxquvydw.supabase.co/functions/v1';
+const AIR_CARE_CONNECT_ORG_ID = '7194773e-a5fd-4666-bb32-2a70e736e7fb';
+
+// Fallback prices only — used until the live fetch from Journey resolves,
+// or if it fails, so this page never shows blank pricing.
 const PLANS = [
-  { id:'silver', name:'Club Aire Azul Plata',   icon:'🥈', annual:189, monthly:15.99, color:'#78909C' },
+  { id:'silver', name:'Club Aire Azul Plata',   icon:'🥈', annual:189, monthly:14.99, color:'#78909C' },
   { id:'gold',   name:'Club Aire Azul Oro',     icon:'⭐', annual:249, monthly:21.99, color:GOLD, badge:'Mejor Valor' },
   { id:'platinum',name:'Club Aire Azul Platino',icon:'💎', annual:399, monthly:35.99, color:SKY,  badge:'VIP' },
 ];
@@ -35,6 +40,7 @@ export default function ClubDocumentsEs() {
   const [email, setEmail]         = useState('');
   const [status, setStatus]       = useState('idle');
   const [sentEmail, setSentEmail] = useState('');
+  const [livePlans, setLivePlans] = useState(PLANS);
 
   useEffect(() => {
     const requested = searchParams.get('plan');
@@ -42,6 +48,23 @@ export default function ClubDocumentsEs() {
     const bill = searchParams.get('billing');
     if (bill === 'monthly') setBilling('monthly');
   }, [searchParams]);
+
+  // Pull live pricing from Journey so this page can never drift from what's
+  // actually charged at checkout.
+  useEffect(() => {
+    fetch(`${JOURNEY_FUNCTIONS_URL}/public-tiers?orgId=${AIR_CARE_CONNECT_ORG_ID}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!data || !data.tiers) return;
+        const byName = {};
+        for (const t of data.tiers) byName[t.name.toLowerCase()] = t;
+        setLivePlans(PLANS.map((p) => {
+          const live = byName[p.id];
+          return live ? { ...p, annual: Number(live.annual_price), monthly: Number(live.monthly_price) } : p;
+        }));
+      })
+      .catch(() => {}); // keep fallback prices if this fails
+  }, []);
 
   const toggle = (id) =>
     setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
@@ -133,7 +156,7 @@ export default function ClubDocumentsEs() {
               <div style={{ marginBottom:28 }}>
                 <div style={labelStyle}>Paso 2 — Seleccione el(los) Plan(es)</div>
                 <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-                  {PLANS.map((p) => {
+                  {livePlans.map((p) => {
                     const active = selected.includes(p.id);
                     const price = billing === 'annual' ? `$${p.annual}/año` : `$${p.monthly}/mes`;
                     const savings = annualSavings(p);
