@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const PHONE_ES_HREF = 'tel:+14079638544';
@@ -15,10 +15,16 @@ const GOLD = '#F9A825';
 const SKY = '#4DB8E8';
 const SKY_PALE = '#E8F6FC';
 
+const JOURNEY_FUNCTIONS_URL = 'https://gatndtsmjrxdgxquvydw.supabase.co/functions/v1';
+const AIR_CARE_CONNECT_ORG_ID = '7194773e-a5fd-4666-bb32-2a70e736e7fb';
+
+// Pricing (price/monthly/discount) is fetched live from Journey's tier table
+// at render time and merged in below — these numbers are only the fallback
+// used if that fetch fails. Everything else is presentation content.
 const PLANS = [
   {
     id:'silver', icon:'🥈', name:'Club Aire Azul Plata',
-    price:189, monthly:15.99,
+    price:189, monthly:14.99, discount:'10%',
     color:'#78909C', colorPale:'#ECEFF1',
     border:'#B0BEC5',
     tagline:'Protección Esencial',
@@ -37,7 +43,7 @@ const PLANS = [
   },
   {
     id:'gold', icon:'⭐', name:'Club Aire Azul Oro',
-    price:249, monthly:21.99,
+    price:249, monthly:21.99, discount:'15%',
     color:GOLD, colorPale:'#FFFDE7',
     border:'#FFD54F',
     tagline:'Confort Completo — Mejor Valor',
@@ -60,7 +66,7 @@ const PLANS = [
   },
   {
     id:'platinum', icon:'💎', name:'Club Aire Azul Platino',
-    price:399, monthly:35.99,
+    price:399, monthly:35.99, discount:'20%',
     color:SKY, colorPale:SKY_PALE,
     border:'#81D4FA',
     tagline:'Tranquilidad Total — VIP',
@@ -84,22 +90,53 @@ const PLANS = [
   },
 ];
 
-const COMPARE_ROWS = [
-  ['Precio Anual','$189','$249','$399'],
-  ['Opción Mensual','$15.99/mes','$21.99/mes','$35.99/mes'],
-  ['Visitas de Mantenimiento','2','2 + revisión','2 + prioridad ilimitada'],
-  ['Filtros Incluidos/Año','2','4','4 + opción de envío'],
-  ['Descuento en Reparaciones','10%','15%','20%'],
-  ['Prioridad de Servicio','Estándar','Alta — 24 hrs','VIP Mismo Día'],
-  ['Tarifa de Visita Exenta','30 días','45 días','Siempre — nunca se cobra'],
-  ['Tratamiento de Serpentín','—','✓ Ambas visitas','Lavado químico'],
-  ['Recarga de Refrigerante','—','—','Hasta 0.5 lb'],
-  ['Transferible','—','—','✓ Sí'],
-  ['Valor Estimado','~$240','~$430','~$650+'],
-];
+function formatAnnual(price) {
+  return '$' + (Number.isInteger(price) ? price : price.toFixed(2));
+}
+function formatMonthly(price) {
+  return '$' + Number(price).toFixed(2) + '/mes';
+}
 
 export default function ClubEs() {
   const [billing, setBilling] = useState('annual');
+  const [liveTiers, setLiveTiers] = useState(null);
+
+  useEffect(() => {
+    fetch(`${JOURNEY_FUNCTIONS_URL}/public-tiers?orgId=${AIR_CARE_CONNECT_ORG_ID}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!data || !data.tiers) return;
+        const byName = {};
+        for (const t of data.tiers) byName[t.name.toLowerCase()] = t;
+        setLiveTiers(byName);
+      })
+      .catch(() => {}); // silently keep fallback prices if this fails
+  }, []);
+
+  const displayPlans = PLANS.map((plan) => {
+    const live = liveTiers && liveTiers[plan.id];
+    if (!live) return plan;
+    return {
+      ...plan,
+      price: Number(live.annual_price),
+      monthly: Number(live.monthly_price),
+      discount: Number(live.discount_pct) + '%',
+    };
+  });
+
+  const compareRows = [
+    ['Precio Anual', ...displayPlans.map((p) => formatAnnual(p.price))],
+    ['Opción Mensual', ...displayPlans.map((p) => formatMonthly(p.monthly))],
+    ['Visitas de Mantenimiento', '2', '2 + revisión', '2 + prioridad ilimitada'],
+    ['Filtros Incluidos/Año', '2', '4', '4 + opción de envío'],
+    ['Descuento en Reparaciones', ...displayPlans.map((p) => p.discount)],
+    ['Prioridad de Servicio', 'Estándar', 'Alta — 24 hrs', 'VIP Mismo Día'],
+    ['Tarifa de Visita Exenta', '30 días', '45 días', 'Siempre — nunca se cobra'],
+    ['Tratamiento de Serpentín', '—', '✓ Ambas visitas', 'Lavado químico'],
+    ['Recarga de Refrigerante', '—', '—', 'Hasta 0.5 lb'],
+    ['Transferible', '—', '—', '✓ Sí'],
+    ['Valor Estimado', ...displayPlans.map((p) => p.value)],
+  ];
 
   return (
     <>
@@ -155,7 +192,7 @@ export default function ClubEs() {
             gridTemplateColumns:'repeat(auto-fit, minmax(300px, 1fr))',
             gap:24, alignItems:'start',
           }}>
-            {PLANS.map(plan => (
+            {displayPlans.map(plan => (
               <div key={plan.id} style={{
                 background:WHITE,
                 border:`2px solid ${plan.highlight ? plan.color : GRAY_LT}`,
@@ -292,7 +329,7 @@ export default function ClubEs() {
                 </tr>
               </thead>
               <tbody>
-                {COMPARE_ROWS.map(([label,...vals], ri) => (
+                {compareRows.map(([label,...vals], ri) => (
                   <tr key={ri} style={{ background: ri%2===0 ? WHITE : OFF_WHITE }}>
                     <td style={{ padding:'13px 20px', fontWeight:500, color:NAVY, borderBottom:`1px solid ${GRAY_LT}` }}>{label}</td>
                     {vals.map((v,vi) => (
