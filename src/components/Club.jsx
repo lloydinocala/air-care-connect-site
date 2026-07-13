@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const PHONE_EN_HREF = 'tel:+13524846341';
@@ -13,10 +13,18 @@ const GRAY = '#8FA3B1';
 const GRAY_DK = '#4A5568';
 const GOLD = '#F9A825';
 
+const JOURNEY_FUNCTIONS_URL = 'https://gatndtsmjrxdgxquvydw.supabase.co/functions/v1';
+const AIR_CARE_CONNECT_ORG_ID = '7194773e-a5fd-4666-bb32-2a70e736e7fb';
+
+// Pricing (price/monthly/discount) is fetched live from Journey's tier table
+// at render time and merged in below — these numbers are only the fallback
+// used if that fetch fails, so the page never breaks or shows blank prices.
+// Everything else here (features, colors, badges, copy) is presentation
+// content that lives on the site, not in Journey.
 const PLANS = [
   {
     id:'silver', icon:'🥈', name:'Air-Care Silver',
-    price:189, monthly:14.99,
+    price:189, monthly:14.99, discount:'10%',
     color:'#78909C', colorPale:'#ECEFF1',
     border:'#B0BEC5',
     tagline:'Essential Protection',
@@ -35,7 +43,7 @@ const PLANS = [
   },
   {
     id:'gold', icon:'⭐', name:'Air-Care Gold',
-    price:249, monthly:21.99,
+    price:249, monthly:21.99, discount:'15%',
     color:GOLD, colorPale:'#FFFDE7',
     border:'#FFD54F',
     tagline:'Complete Comfort — Most Popular',
@@ -58,7 +66,7 @@ const PLANS = [
   },
   {
     id:'platinum', icon:'💎', name:'Air-Care Platinum',
-    price:399, monthly:35.99,
+    price:399, monthly:35.99, discount:'20%',
     color:SKY, colorPale:SKY_PALE,
     border:'#81D4FA',
     tagline:'Total Peace of Mind — VIP',
@@ -82,22 +90,55 @@ const PLANS = [
   },
 ];
 
-const COMPARE_ROWS = [
-  ['Annual Price','$189','$249','$399'],
-  ['Monthly Option','$14.99/mo','$21.99/mo','$35.99/mo'],
-  ['Tune-Up Visits','2','2 + comfort check','2 + unlimited priority'],
-  ['Filters Included/Year','2','4','4 + delivery option'],
-  ['Repair Discount','10%','15%','20%'],
-  ['Service Priority','Standard','Peak 24-hr','VIP Same-Day'],
-  ['Service Call Fee Waived','30 days','45 days','Always — never charged'],
-  ['Coil Treatment','—','✓ Both visits','Chemical wash'],
-  ['Refrigerant Top-Off','—','—','Up to 0.5 lb'],
-  ['Transferable','—','—','✓ Yes'],
-  ['Estimated Value','~$240','~$430','~$650+'],
-];
+function formatAnnual(price) {
+  return '$' + (Number.isInteger(price) ? price : price.toFixed(2));
+}
+function formatMonthly(price) {
+  return '$' + Number(price).toFixed(2) + '/mo';
+}
 
 export default function Club() {
   const [billing, setBilling] = useState('annual');
+  const [liveTiers, setLiveTiers] = useState(null);
+
+  useEffect(() => {
+    fetch(`${JOURNEY_FUNCTIONS_URL}/public-tiers?orgId=${AIR_CARE_CONNECT_ORG_ID}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!data || !data.tiers) return;
+        const byName = {};
+        for (const t of data.tiers) byName[t.name.toLowerCase()] = t;
+        setLiveTiers(byName);
+      })
+      .catch(() => {}); // silently keep fallback prices if this fails
+  }, []);
+
+  // Merge live pricing over the static plan copy. Falls back to the
+  // hardcoded defaults above until the fetch resolves (or if it fails).
+  const displayPlans = PLANS.map((plan) => {
+    const live = liveTiers && liveTiers[plan.id];
+    if (!live) return plan;
+    return {
+      ...plan,
+      price: Number(live.annual_price),
+      monthly: Number(live.monthly_price),
+      discount: Number(live.discount_pct) + '%',
+    };
+  });
+
+  const compareRows = [
+    ['Annual Price', ...displayPlans.map((p) => formatAnnual(p.price))],
+    ['Monthly Option', ...displayPlans.map((p) => formatMonthly(p.monthly))],
+    ['Tune-Up Visits', '2', '2 + comfort check', '2 + unlimited priority'],
+    ['Filters Included/Year', '2', '4', '4 + delivery option'],
+    ['Repair Discount', ...displayPlans.map((p) => p.discount)],
+    ['Service Priority', 'Standard', 'Peak 24-hr', 'VIP Same-Day'],
+    ['Service Call Fee Waived', '30 days', '45 days', 'Always — never charged'],
+    ['Coil Treatment', '—', '✓ Both visits', 'Chemical wash'],
+    ['Refrigerant Top-Off', '—', '—', 'Up to 0.5 lb'],
+    ['Transferable', '—', '—', '✓ Yes'],
+    ['Estimated Value', ...displayPlans.map((p) => p.value)],
+  ];
 
   return (
     <>
@@ -155,7 +196,7 @@ export default function Club() {
             gridTemplateColumns:'repeat(auto-fit, minmax(300px, 1fr))',
             gap:24, alignItems:'start',
           }}>
-            {PLANS.map(plan => (
+            {displayPlans.map(plan => (
               <div key={plan.id} style={{
                 background:WHITE,
                 border:`2px solid ${plan.highlight ? plan.color : GRAY_LT}`,
@@ -301,7 +342,7 @@ export default function Club() {
                 </tr>
               </thead>
               <tbody>
-                {COMPARE_ROWS.map(([label,...vals], ri) => (
+                {compareRows.map(([label,...vals], ri) => (
                   <tr key={ri} style={{ background: ri%2===0 ? WHITE : OFF_WHITE }}>
                     <td style={{ padding:'13px 20px', fontWeight:500, color:NAVY, borderBottom:`1px solid ${GRAY_LT}` }}>{label}</td>
                     {vals.map((v,vi) => (
@@ -338,4 +379,3 @@ export default function Club() {
     </>
   );
 }
-
