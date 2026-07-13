@@ -1,6 +1,11 @@
-// Vercel Serverless Function — Dynamically creates a Stripe Checkout Session
-// for the requested plan and billing period, then redirects the customer
-// straight into Stripe's hosted checkout.
+// Vercel Serverless Function — Creates a Stripe Checkout Session for the
+// requested plan and billing period via Journey-HVAC's Stripe Connect setup,
+// then redirects the customer straight into Stripe's hosted checkout.
+//
+// This used to call Stripe directly with a separate API key and hardcoded
+// Price IDs. It now delegates to Journey so the resulting subscription,
+// customer, property, and agreement all land in the same system Air-Care
+// Connect runs on day to day — no more disconnected signups.
 //
 // URL params:
 //   plan    = silver | gold | platinum
@@ -8,14 +13,8 @@
 //   email   = customer email (optional, pre-fills Stripe checkout)
 
 const SITE_URL = 'https://www.air-careconnect.com';
-
-// Map plan+billing to the Vercel env var that holds the Stripe Price ID.
-// In Stripe: each product gets TWO prices — one yearly recurring, one monthly.
-const PRICE_ENV = {
-  silver:   { annual: 'STRIPE_PRICE_SILVER',          monthly: 'STRIPE_PRICE_SILVER_MONTHLY' },
-  gold:     { annual: 'STRIPE_PRICE_GOLD',            monthly: 'STRIPE_PRICE_GOLD_MONTHLY' },
-  platinum: { annual: 'STRIPE_PRICE_PLATINUM',        monthly: 'STRIPE_PRICE_PLATINUM_MONTHLY' },
-};
+const JOURNEY_FUNCTIONS_URL = 'https://gatndtsmjrxdgxquvydw.supabase.co/functions/v1';
+const AIR_CARE_CONNECT_ORG_ID = '7194773e-a5fd-4666-bb32-2a70e736e7fb';
 
 const PLAN_NAMES = {
   silver:   'Air-Care Silver',
@@ -35,53 +34,36 @@ function errorPage(message) {
 }
 
 export default async function handler(req, res) {
-  const STRIPE_API_KEY = process.env.STRIPE_API_KEY;
   const { plan, billing = 'annual', email } = req.query;
   const billingPeriod = billing === 'monthly' ? 'monthly' : 'annual';
 
   res.setHeader('Content-Type', 'text/html');
 
-  if (!STRIPE_API_KEY) {
-    return res.status(500).end(errorPage("Online enrollment isn't set up yet on our end."));
-  }
-  if (!plan || !PRICE_ENV[plan]) {
+  if (!plan || !PLAN_NAMES[plan]) {
     return res.status(400).end(errorPage("We couldn't tell which plan you meant."));
   }
 
-  const priceEnvKey = PRICE_ENV[plan][billingPeriod];
-  const priceId = process.env[priceEnvKey];
-  if (!priceId) {
-    return res.status(500).end(
-      errorPage(`That plan isn't available for online enrollment just yet — ${PLAN_NAMES[plan]}, ${billingPeriod} billing.`)
-    );
-  }
-
   try {
-    const params = new URLSearchParams();
-    params.append('mode', 'subscription');
-    params.append('line_items[0][price]', priceId);
-    params.append('line_items[0][quantity]', '1');
-    params.append('success_url', `${SITE_URL}/club?enrolled=1&plan=${plan}`);
-    params.append('cancel_url', `${SITE_URL}/club`);
-    // Pre-fill the customer's email so they don't have to re-type it
-    if (email) params.append('customer_email', email);
-    // Show a phone number on the checkout page so they can call if anything goes wrong
-    params.append('phone_number_collection[enabled]', 'false');
-
-    const r = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+    const r = await fetch(`${JOURNEY_FUNCTIONS_URL}/public-club-checkout`, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${STRIPE_API_KEY}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: params,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        orgId: AIR_CARE_CONNECT_ORG_ID,
+        tierName: plan,
+        billingCycle: billingPeriod,
+        email: email || undefined,
+        successUrl: `${SITE_URL}/club?enrolled=1&plan=${plan}`,
+        cancelUrl: `${SITE_URL}/club`,
+      }),
     });
 
     const data = await r.json();
 
     if (!r.ok || !data.url) {
-      console.error('Stripe error:', JSON.stringify(data));
-      return res.status(502).end(errorPage("Our payment provider couldn't start the checkout session."));
+      console.error('Journey checkout error:', JSON.stringify(data));
+      return res.status(502).end(
+        errorPage(`We couldn't start checkout for ${PLAN_NAMES[plan]} right now. ${data.error || ''}`)
+      );
     }
 
     // Redirect the customer straight into Stripe's hosted checkout
