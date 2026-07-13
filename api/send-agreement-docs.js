@@ -1,22 +1,32 @@
 // Vercel Serverless Function — Emails Air-Care Club agreement PDF(s) to a
 // prospective member with correct pricing for their chosen billing period
 // (annual or monthly) and a dynamic "Enroll & Pay" checkout link per plan.
+//
+// Pricing now comes live from Journey-HVAC's maintenance_agreement_tiers
+// table (via public-tiers) instead of a hardcoded PLAN_INFO price map, so
+// this email can never quote a different number than what's actually
+// charged at checkout. Leads are logged into Journey (journey-core) instead
+// of the old air-care-connect1 project, so leads and agreements finally
+// live in the same place.
 
 const SITE_URL = 'https://www.air-careconnect.com';
 const OFFICE_EMAIL = 'info@air-careconnect.com';
-const SUPABASE_URL = 'https://dalertxugwgkfsyizmly.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_nPaxXCiHyZkO8MkRsz-1Zw_ZgPBlybk';
+const JOURNEY_FUNCTIONS_URL = 'https://gatndtsmjrxdgxquvydw.supabase.co/functions/v1';
+const AIR_CARE_CONNECT_ORG_ID = '7194773e-a5fd-4666-bb32-2a70e736e7fb';
 
+// Static presentation content only (PDF filenames, display names) — pricing
+// is fetched live. These fallback prices are only used if the live fetch
+// fails, so the email never breaks outright.
 const PLAN_INFO = {
   en: {
-    silver:   { name: 'Air-Care Silver',   file: 'AirCare_Silver_Membership_Agreement.pdf',     annual: '$189/year',  monthly: '$15.99/month' },
-    gold:     { name: 'Air-Care Gold',     file: 'AirCare_Gold_Membership_Agreement.pdf',        annual: '$249/year',  monthly: '$21.99/month' },
-    platinum: { name: 'Air-Care Platinum', file: 'AirCare_Platinum_Membership_Agreement.pdf',    annual: '$399/year',  monthly: '$35.99/month' },
+    silver:   { name: 'Air-Care Silver',   file: 'AirCare_Silver_Membership_Agreement.pdf',     fallbackAnnual: 189, fallbackMonthly: 14.99 },
+    gold:     { name: 'Air-Care Gold',     file: 'AirCare_Gold_Membership_Agreement.pdf',        fallbackAnnual: 249, fallbackMonthly: 21.99 },
+    platinum: { name: 'Air-Care Platinum', file: 'AirCare_Platinum_Membership_Agreement.pdf',    fallbackAnnual: 399, fallbackMonthly: 35.99 },
   },
   es: {
-    silver:   { name: 'Club Aire Azul Plata',   file: 'ClubAireAzul_Plata_Acuerdo_Membresia.pdf',   annual: '$189/año', monthly: '$15.99/mes' },
-    gold:     { name: 'Club Aire Azul Oro',     file: 'ClubAireAzul_Oro_Acuerdo_Membresia.pdf',      annual: '$249/año', monthly: '$21.99/mes' },
-    platinum: { name: 'Club Aire Azul Platino', file: 'ClubAireAzul_Platino_Acuerdo_Membresia.pdf',  annual: '$399/año', monthly: '$35.99/mes' },
+    silver:   { name: 'Club Aire Azul Plata',   file: 'ClubAireAzul_Plata_Acuerdo_Membresia.pdf',   fallbackAnnual: 189, fallbackMonthly: 14.99 },
+    gold:     { name: 'Club Aire Azul Oro',     file: 'ClubAireAzul_Oro_Acuerdo_Membresia.pdf',      fallbackAnnual: 249, fallbackMonthly: 21.99 },
+    platinum: { name: 'Club Aire Azul Platino', file: 'ClubAireAzul_Platino_Acuerdo_Membresia.pdf',  fallbackAnnual: 399, fallbackMonthly: 35.99 },
   },
 };
 
@@ -44,6 +54,48 @@ const STRINGS = {
     officeSubject: (e) => `\uD83D\uDCC4 Solicitud de acuerdo Club \u2014 ${e}`,
   },
 };
+
+function formatAnnual(price) {
+  return '$' + (Number.isInteger(price) ? price : price.toFixed(2));
+}
+function formatMonthly(price) {
+  return '$' + Number(price).toFixed(2);
+}
+
+async function fetchLiveTiers() {
+  try {
+    const r = await fetch(`${JOURNEY_FUNCTIONS_URL}/public-tiers?orgId=${AIR_CARE_CONNECT_ORG_ID}`);
+    if (!r.ok) return {};
+    const data = await r.json();
+    const byName = {};
+    for (const t of data.tiers || []) {
+      byName[t.name.toLowerCase()] = t;
+    }
+    return byName;
+  } catch (e) {
+    console.error('public-tiers fetch failed, using fallback prices:', e);
+    return {};
+  }
+}
+
+async function logLead({ email, plans, billingPeriod, lang }) {
+  try {
+    await fetch(`${JOURNEY_FUNCTIONS_URL}/public-lead-capture`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        orgId: AIR_CARE_CONNECT_ORG_ID,
+        leadType: 'club_document_request',
+        customerEmail: email,
+        language: lang,
+        source: 'website',
+        notes: `Requested Club agreement(s): ${plans.join(', ')}. Billing: ${billingPeriod}.`,
+      }),
+    });
+  } catch (e) {
+    console.warn('Lead save error:', e);
+  }
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -73,10 +125,15 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'No valid plans provided' });
     }
 
+    const liveTiers = await fetchLiveTiers();
+
     // Build plan cards for the email
     const planBlocks = validPlans.map((key) => {
       const p = info[key];
-      const price = billingPeriod === 'monthly' ? p.monthly : p.annual;
+      const live = liveTiers[key];
+      const annualPrice = live ? live.annual_price : p.fallbackAnnual;
+      const monthlyPrice = live ? live.monthly_price : p.fallbackMonthly;
+      const price = billingPeriod === 'monthly' ? `${formatMonthly(monthlyPrice)}/mo` : `${formatAnnual(annualPrice)}/yr`;
       const pdfUrl = `${SITE_URL}/agreements/${p.file}`;
       // Checkout link passes plan, billing period, and pre-fills their email
       const checkoutUrl = `${SITE_URL}/api/start-checkout?plan=${key}&billing=${billingPeriod}&email=${encodeURIComponent(email)}`;
@@ -141,21 +198,8 @@ export default async function handler(req, res) {
       });
     } catch (e) { console.error('Office notify error:', e); }
 
-    // Log as a lead for follow-up — best effort
-    try {
-      await fetch(`${SUPABASE_URL}/rest/v1/leads`, {
-        method: 'POST',
-        headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-        body: JSON.stringify({
-          lead_type: 'club_document_request',
-          customer_email: email,
-          notes: `[Marketing site] Requested Club agreement(s): ${validPlans.map((k) => info[k].name).join(', ')}. Billing: ${billingPeriod}.`,
-          language: lang,
-          lead_status: 'new',
-          organization_id: 1,
-        }),
-      });
-    } catch (e) { console.warn('Lead save error:', e); }
+    // Log as a lead in Journey for follow-up — best effort
+    await logLead({ email, plans: validPlans.map((k) => info[k].name), billingPeriod, lang });
 
     return res.status(200).json({ success: true });
 
